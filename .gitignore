@@ -2,7 +2,9 @@
 .classpath
 .gitattributes
 .project
-/target/
+/target/*
+!/target/*.jar
+!/target/*.pom
 .idea
 *.iml
 /bin/
