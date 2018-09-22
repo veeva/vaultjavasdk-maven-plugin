@@ -100,6 +100,8 @@ public class UIToolPlugin extends AbstractMojo {
 	protected String username = "";
 	@Parameter( property = "password", defaultValue = "" )
 	protected String password = "";
+	@Parameter( property = "source", defaultValue = "javasdk" )
+	protected String source = "";
 	
     public void execute() throws MojoExecutionException
     {  

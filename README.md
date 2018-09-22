@@ -14,6 +14,7 @@ Next, to make this Maven plugin available in a Vault Java SDK project, add the f
 	        		<vaultUrl>https://<vault-url>.veevavault.com</vaultUrl>
 	        		<username>user@example.com</username>
 	        		<password></password>
+	        		<source></source>
 	        		<apiVersion>v18.3</apiVersion>
 	        	</configuration>
         	</plugin>
