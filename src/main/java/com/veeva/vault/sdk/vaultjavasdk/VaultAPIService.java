@@ -73,7 +73,7 @@ public class VaultAPIService {
 		        //Checks for a valid HTTP response code and then parses the respnse content in Java objects.
 		        int responsecode = con.getResponseCode(); 
 				if (responsecode != 200){
-					 DeployPlugin.outputTextField.append("Connection failure with HttpResponseCode: " +responsecode + "\n\n");
+					UIToolPlugin.outputTextField.append("Connection failure with HttpResponseCode: " +responsecode + "\n\n");
 //					throw new RuntimeException("HttpResponseCode: " +responsecode);	
 				}
 				else
@@ -82,17 +82,19 @@ public class VaultAPIService {
 					if (authResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 						authResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 						
-						 DeployPlugin.outputTextField.append(authResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) authResponse.getField("responseMessage")+ "\n\n");
-						 DeployPlugin.outputTextField.append("Authentication Error: " + (String) authResponse.getField("responseMessage")+ "\n\n");
-						 DeployPlugin.outputTextField.append("Errors:" + (String) authResponse.getErrors().toString()+ "\n\n");	
-						System.out.println("Error: " +  authResponse.getField("responseMessage"));
-						System.out.println(authResponse.getErrors().toString());
+						 UIToolPlugin.outputTextField.append(authResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) authResponse.getField("responseMessage")+ "\n\n");
+						 UIToolPlugin.outputTextField.append("Authentication Error: " + (String) authResponse.getField("responseMessage")+ "\n\n");
+						 UIToolPlugin.outputTextField.append("Errors:" + (String) authResponse.getErrors().toString()+ "\n\n");	
+						 
+						 System.out.println(authResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) authResponse.getField("responseMessage")+ "\n\n");
+						 System.out.println("Authentication Error: " +  authResponse.getField("responseMessage"));
+						 System.out.println("Errors: " + authResponse.getErrors().toString());
 					}
 					else if (authResponse instanceof AuthType){
 				        if (authResponse.getField("sessionId") != null){
 					        System.out.println("Success - Session ID: " +  authResponse.getField("sessionId"));
 					        setCurrentSessionId((String) authResponse.getField("sessionId")); 
-					         DeployPlugin.outputTextField.append("Success - Session ID: " +  authResponse.getField("sessionId") + "\n\n");
+					         UIToolPlugin.outputTextField.append("Success - Session ID: " +  authResponse.getField("sessionId") + "\n\n");
 					        currentSessionTime = System.currentTimeMillis();
 					        currentUserId = (String) authResponse.getField("userId"); ;
 					        
@@ -100,24 +102,23 @@ public class VaultAPIService {
 				        }
 				        else {
 				        	System.out.println("Failure - Session ID is null: " + (String) authResponse.getField("sessionId"));
-					        System.out.println(authResponse.getField("sessionId"));
-					         DeployPlugin.outputTextField.append("Failure - Session ID is null: " + (String) authResponse.getField("sessionId") + "\n\n");
+					        UIToolPlugin.outputTextField.append("Failure - Session ID is null: " + (String) authResponse.getField("sessionId") + "\n\n");
 					        setCurrentSessionId(null);
 					        currentUserId = null;
 				        }
 					}
 					else {
-						 DeployPlugin.outputTextField.append("Invalid responseType object.\n\n");
-						System.out.println("Invalid responseType object.");
+						 UIToolPlugin.outputTextField.append("Invalid responseType object.\n\n");
+						 System.out.println("Invalid responseType object.");
 					}
 				}
 		
 		    } catch (UnknownHostException e){
-		    	 DeployPlugin.outputTextField.append(e.toString() + "\n\n");
+		    	 UIToolPlugin.outputTextField.append(e.toString() + "\n\n");
 		    	System.out.println(e.toString());
 		    }
 		    catch (IOException e){
-		    	 DeployPlugin.outputTextField.append(e.toString() + "\n\n");
+		    	 UIToolPlugin.outputTextField.append(e.toString() + "\n\n");
 		    	System.out.println(e.toString());
 		    }
 		    finally {
@@ -152,7 +153,7 @@ public class VaultAPIService {
 		        con.setRequestProperty("Accept", "application/json");
 		
 		        try (DataOutputStream wr2 = new DataOutputStream(con.getOutputStream())) {
-		        	 DeployPlugin.outputTextField.append("Upload Package Request: " + myurl + "\n"
+		        	 UIToolPlugin.outputTextField.append("Upload Package Request: " + myurl + "\n"
 		        									  + "File: " + packagePath + "\n\n");
 		        	System.out.println("PUT to " + myurl + "\nFile: " + packagePath);
 		            wr2.write(putData);
@@ -173,32 +174,35 @@ public class VaultAPIService {
 					if (importResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 							importResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 						
-						 DeployPlugin.outputTextField.append(importResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) importResponse.getField("responseMessage") + "\n\n");
-						 DeployPlugin.outputTextField.append("Package Import Error: " + (String) importResponse.getField("responseMessage")+ "\n\n");
-						 DeployPlugin.outputTextField.append("Error Type:" + (String) importResponse.getField("errorType")+ "\n\n");	
-						System.out.println("Package Import Error: "  + (String) importResponse.getField("responseMessage"));
-						System.out.println("Error Type:" + (String) importResponse.getField("errorType"));	
+						 UIToolPlugin.outputTextField.append(importResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) importResponse.getField("responseMessage") + "\n\n");
+						 UIToolPlugin.outputTextField.append("Package Import Error: " + (String) importResponse.getField("responseMessage")+ "\n\n");
+						 UIToolPlugin.outputTextField.append("Error Type:" + (String) importResponse.getField("errorType")+ "\n\n");	
+						
+						 System.out.println(importResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) importResponse.getField("responseMessage") + "\n\n");
+						 System.out.println("Package Import Error: "  + (String) importResponse.getField("responseMessage"));
+						 System.out.println("Error Type:" + (String) importResponse.getField("errorType"));	
 						
 						return null;
 					}
 					else if (importResponse instanceof ImportType){
 				        currentSessionTime = System.currentTimeMillis();
 				        
-				        System.out.println("Bulk API is: " + (String) importResponse.getField("responseStatus") + 
+				         System.out.println("Bulk API is: " + (String) importResponse.getField("responseStatus") + 
 				        		"\nDaily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
 				        		"\nBurst API Limit: "+ con.getHeaderField("X-VaultAPI-BurstLimitRemaining"));
-				         DeployPlugin.outputTextField.append("Package Upload SUCCESS: \n");
-//				         DeployPlugin.outputTextField.append("Package Upload SUCCESS: \n");
-				         DeployPlugin.outputTextField.append(" * Package Name: " + (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("name") + 
+				         UIToolPlugin.outputTextField.append("Package Upload SUCCESS: \n");
+				         UIToolPlugin.outputTextField.append(" * Package Name: " + (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("name") + 
 				        								  "\n * Package Id: " + ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id") + "\n\n");
-				        System.out.println("SUCCESS Package Name: " + (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("name"));
-				        System.out.println("SUCCESS Package Id: " + ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id"));
 				        
-				        return (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id");
+				         System.out.println("Package Upload SUCCESS: \n");
+				         System.out.println("Package Name: " + (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("name"));
+				         System.out.println("Package Id: " + ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id"));
+				        
+				         return (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id");
 					}
 					else {
-						System.out.println("Invalid responseType object.");
-						return null;
+						 System.out.println("Invalid responseType object.");
+						 return null;
 					}
 				}		        
 		       
@@ -232,7 +236,6 @@ public class VaultAPIService {
 		
 		        try (DataOutputStream wr2 = new DataOutputStream(con.getOutputStream())) {
 		        	System.out.println("PUT to " + myurl + "\nVault Package ID: " + packageId);
-//		            wr2.write(putData);
 		            wr2.flush();
 		            wr2.close();
 		        }	
@@ -250,12 +253,13 @@ public class VaultAPIService {
 					if (deployResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 							deployResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 						
-						 DeployPlugin.outputTextField.append(deployResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) deployResponse.getField("responseMessage")+ "\n\n");
-						 DeployPlugin.outputTextField.append("Package Deployment Error: " + (String) deployResponse.getField("responseMessage")+ "\n\n");
-						 DeployPlugin.outputTextField.append("Error Type:" + (String) deployResponse.getErrors().toString()+ "\n\n");	
+						 UIToolPlugin.outputTextField.append(deployResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) deployResponse.getField("responseMessage")+ "\n\n");
+						 UIToolPlugin.outputTextField.append("Package Deployment Error: " + (String) deployResponse.getField("responseMessage")+ "\n\n");
+						 UIToolPlugin.outputTextField.append("Error Type:" + (String) deployResponse.getErrors().toString()+ "\n\n");	
 						
-						System.out.println("Package Deployment Error: " + (String) deployResponse.getField("responseMessage"));
-						System.out.println("Error Type:" + (String) deployResponse.getErrors().toString());	
+						 System.out.println(deployResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) deployResponse.getField("responseMessage")+ "\n\n");
+						 System.out.println("Package Deployment Error: " + (String) deployResponse.getField("responseMessage"));
+						 System.out.println("Error Type:" + (String) deployResponse.getErrors().toString());	
 					}
 					else if (deployResponse instanceof DeployType){
 				        currentSessionTime = System.currentTimeMillis();
@@ -263,8 +267,9 @@ public class VaultAPIService {
 				        System.out.println("Bulk API is: " + (String) deployResponse.getField("responseStatus") + 
 				        		"\nDaily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
 				        		"\nBurst API Limit: "+ con.getHeaderField("X-VaultAPI-BurstLimitRemaining"));
-				         DeployPlugin.outputTextField.append("Successfully started deploy Job with Id: " + deployResponse.getField("job_id") + "\n\n");
-				        System.out.println(deployResponse.getField("job_id"));
+				        
+				        UIToolPlugin.outputTextField.append("Successfully started deploy Job with Id: " + deployResponse.getField("job_id") + "\n\n");
+				        System.out.println("Successfully started deploy Job with Id: " + deployResponse.getField("job_id") + "\n\n");
 					}
 					else {
 						System.out.println("Invalid responseType object.");

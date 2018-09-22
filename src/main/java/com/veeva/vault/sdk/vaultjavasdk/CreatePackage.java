@@ -32,8 +32,15 @@ public class CreatePackage {
 		
 		PROJECT_DIRECTORY = path.toAbsolutePath().getFileName().toString();
 		
-		System.out.println("directory: " + path.toAbsolutePath().getFileName().toString());
-		System.out.println(path.toAbsolutePath().toString());
+		System.out.println("Project Directory: " + path.toAbsolutePath().getFileName().toString());
+		
+		return path.toAbsolutePath().toString();
+	}
+	
+	public static String getSourcePath(String sourcePath) {
+		Path path = Paths.get("", sourcePath);
+	
+		System.out.println("Source Path: " + path.toAbsolutePath().toString());
 		
 		return path.toAbsolutePath().toString();
 	}
@@ -83,94 +90,92 @@ public class CreatePackage {
 	
 	
 	
-	//Create the "code_package.vpk" zip file with an internal structure of "javasdk/src/main/java/com/veeva/vault/custom/<customer folders>".
-	//The files to zip are retrieved from a customer provided path. If the customer path doesn't contain "com/veeva/vault/custom" folders,
-	//the zip process will fail.
-	public static void createZipFile(String pathToZip) throws IOException {
-		Path path = Paths.get(pathToZip);
-		
-		//Create the necessary directories if they don't already exist
-		File tmp = new File(OUTPUT_ZIP_FILE);
-		tmp.getParentFile().mkdirs();
-		
-		//Create the vsdk_code_package.vpk file. If the file already exists, delete it and recreate it.
-		Path outputPath = Paths.get("", OUTPUT_ZIP_FILE);
-		
-		//Walk through and zip the path's directory structure and filter out any files that aren't in "com/veeva/vault/custom".
-		Stream<Path> fileWalk = Files.walk(path);
-    	if (!fileWalk.noneMatch(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") && !Files.isDirectory(pp))) {
-		    try (ZipArchiveOutputStream zs = new ZipArchiveOutputStream(Files.newOutputStream(outputPath,StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
-		    	zs.setCreateUnicodeExtraFields(UnicodeExtraFieldPolicy.ALWAYS);
-		        
-			    	ZipArchiveEntry zipXMLEntry = new ZipArchiveEntry("vaultpackage.xml");
-			          try {
-			                zs.putArchiveEntry(zipXMLEntry);
-			                Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
-			                zs.closeArchiveEntry();
-			          } catch (IOException e) {
-			                System.err.println(e);
-			          }
-		    	
-			        Files.walk(path)
-			          .filter(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") && !Files.isDirectory(pp))
-			          .forEach(p -> {
-		
-			        	  Iterator<Path> iterate = p.iterator();
-			        	  int startSequence = 0;
-			        	  int endSequence = p.getNameCount();
-			        	  
-			        	  while (iterate.hasNext()) {
-			        		  Path name = iterate.next();
-		
-			        		  System.out.println(name.toString());
-			        		  if (name.toString().contentEquals("com")) {
-			        			  
-			        			  name = iterate.next();
-			        			  if (name.toString().contentEquals("veeva")) {
-				        			  break;
-			        			  }
-			        		  }
-			        		  else {
-			        			  startSequence += 1;
-			        		  }
-			        	  }
-			        	  
-			        	  System.out.println("p: " + p);
-			        	  System.out.println("path: " + p);
-			        	  System.out.println("relativize: " + path.relativize(p).toString());
-			        	  DeployPlugin.outputTextField.append("Packaging file: " + p.toString() + "\n\n");
-			        	  System.out.println("Packaging file: " + p.toString() + "\n\n");
-			        	  System.out.println("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
-			        	        	  
-			        	  ZipArchiveEntry zipEntry = new ZipArchiveEntry("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
-				          try {
-				                zs.putArchiveEntry(zipEntry);
-				                Files.copy(p, zs);
-				                zs.closeArchiveEntry();
-				          } catch (IOException e) {
-				                System.err.println(e);
-				          }
-			         });
-		    	
-		    	fileWalk.close();
-		        zs.flush();
-		        zs.close();
-		         DeployPlugin.outputTextField.append("Successfully created VPK: " + Paths.get("", OUTPUT_ZIP_FILE).toAbsolutePath().toString()+ "\n\n");
-	    	}
-		    catch (Exception e) {
-		    	 DeployPlugin.outputTextField.append("ERROR " + e.toString());
-		    }
-	    }
-	    else {
-	    	
-    	 DeployPlugin.outputTextField.append("Source directory format is invalid - it must contain a 'com/veeva/vault/custom' directory structure. VPK was not created.\n\n");
-	
-	    }
-	}
-	
-	
-	
-	
+//	//Create the "code_package.vpk" zip file with an internal structure of "javasdk/src/main/java/com/veeva/vault/custom/<customer folders>".
+//	//The files to zip are retrieved from a customer provided path. If the customer path doesn't contain "com/veeva/vault/custom" folders,
+//	//the zip process will fail.
+//	public static void createZipFile(String pathToZip) throws IOException {
+//		Path path = Paths.get(pathToZip);
+//		
+//		//Create the necessary directories if they don't already exist
+//		File tmp = new File(OUTPUT_ZIP_FILE);
+//		tmp.getParentFile().mkdirs();
+//		
+//		//Create the vsdk_code_package.vpk file. If the file already exists, delete it and recreate it.
+//		Path outputPath = Paths.get("", OUTPUT_ZIP_FILE);
+//		
+//		//Walk through and zip the path's directory structure and filter out any files that aren't in "com/veeva/vault/custom".
+//		Stream<Path> fileWalk = Files.walk(path);
+//    	if (!fileWalk.noneMatch(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") && !Files.isDirectory(pp))) {
+//		    try (ZipArchiveOutputStream zs = new ZipArchiveOutputStream(Files.newOutputStream(outputPath,StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
+//		    	zs.setCreateUnicodeExtraFields(UnicodeExtraFieldPolicy.ALWAYS);
+//		        
+//			    	ZipArchiveEntry zipXMLEntry = new ZipArchiveEntry("vaultpackage.xml");
+//			          try {
+//			                zs.putArchiveEntry(zipXMLEntry);
+//			                Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
+//			                zs.closeArchiveEntry();
+//			          } catch (IOException e) {
+//			                System.err.println(e);
+//			          }
+//		    	
+//			        Files.walk(path)
+//			          .filter(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") && !Files.isDirectory(pp))
+//			          .forEach(p -> {
+//		
+//			        	  Iterator<Path> iterate = p.iterator();
+//			        	  int startSequence = 0;
+//			        	  int endSequence = p.getNameCount();
+//			        	  
+//			        	  while (iterate.hasNext()) {
+//			        		  Path name = iterate.next();
+//		
+//			        		  if (name.toString().contentEquals("com")) {
+//			        			  
+//			        			  name = iterate.next();
+//			        			  if (name.toString().contentEquals("veeva")) {
+//				        			  break;
+//			        			  }
+//			        		  }
+//			        		  else {
+//			        			  startSequence += 1;
+//			        		  }
+//			        	  }
+//			        	  
+////			        	  System.out.println("p: " + p);
+////			        	  System.out.println("path: " + p);
+////			        	  System.out.println("relativize: " + path.relativize(p).toString());
+//			        	  UIToolPlugin.outputTextField.append("Packaging file: " + p.toString() + "\n\n");
+//			        	  System.out.println("Packaging file: " + p.toString() + "\n\n");
+//			        	  System.out.println("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
+//			        	        	  
+//			        	  ZipArchiveEntry zipEntry = new ZipArchiveEntry("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
+//				          try {
+//				                zs.putArchiveEntry(zipEntry);
+//				                Files.copy(p, zs);
+//				                zs.closeArchiveEntry();
+//				          } catch (IOException e) {
+//				                System.err.println(e);
+//				          }
+//			         });
+//		    	
+//		    	fileWalk.close();
+//		        zs.flush();
+//		        zs.close();
+//		         UIToolPlugin.outputTextField.append("Successfully created VPK: " + Paths.get("", OUTPUT_ZIP_FILE).toAbsolutePath().toString()+ "\n\n");
+//		         System.out.println("Successfully created VPK: " + Paths.get("", OUTPUT_ZIP_FILE).toAbsolutePath().toString()+ "\n\n");
+//	    	}
+//		    catch (Exception e) {
+//		    	 UIToolPlugin.outputTextField.append("ERROR " + e.toString());
+//		    	 System.out.println("ERROR " + e.toString());
+//		    }
+//	    }
+//	    else {
+//	    	
+//    	 UIToolPlugin.outputTextField.append("Source directory format is invalid - it must contain a 'com/veeva/vault/custom' directory structure. VPK was not created.\n\n");
+//    	 System.out.println("Source directory format is invalid - it must contain a 'com/veeva/vault/custom' directory structure. VPK was not created.\n\n");
+//	
+//	    }
+//	}
 	
 	//Create the "code_package.vpk" zip file with an internal structure of "javasdk/src/main/java/com/veeva/vault/custom/<customer folders>".
 	//The files to zip are retrieved from a customer provided path. If the customer path doesn't contain "com/veeva/vault/custom" folders,
@@ -204,7 +209,10 @@ public class CreatePackage {
 				List<Path> fileList = fileWalk.filter(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") && !Files.isDirectory(pp)).collect(Collectors.toList());
 				
 				if (fileList.size() == 0) {
-					DeployPlugin.outputTextField.append("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
+					UIToolPlugin.outputTextField.append("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
+							+ "\n\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.\n\n");
+					
+					System.out.println("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
 							+ "\n\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.\n\n");
 				}
 				else {
@@ -230,14 +238,15 @@ public class CreatePackage {
 			        			  startSequence += 1;
 			        		  }
 			        	  }
-			        	  
-			        	  System.out.println("p: " + p);
-			        	  System.out.println("path: " + p);
-			        	  System.out.println("relativize: " + path.relativize(p).toString());
-			        	  
-			        	  DeployPlugin.outputTextField.append("Packaging file: " + p.toString() + "\n\n");
+//			        	  
+//			        	  System.out.println("p: " + p);
+//			        	  System.out.println("path: " + p);
+//			        	  System.out.println("relativize: " + path.relativize(p).toString());
+//			        	  
+			        	  UIToolPlugin.outputTextField.append("Packaging file: " + p.toString() + "\n\n");
 			        	  System.out.println("Packaging file: " + p.toString() + "\n\n");
-			        	  System.out.println("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
+			        	  
+//			        	  System.out.println("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
 			        	        	  
 			        	  ZipArchiveEntry zipEntry = new ZipArchiveEntry("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
 				          try {
@@ -254,20 +263,23 @@ public class CreatePackage {
 	  		}
 	  		
 	        zs.flush();
-	        System.out.println(zs.getBytesWritten());
+	        System.out.println(zs.getBytesWritten() + " bytes written to VPK.");
 	        if (writtenBytesCount > 0) {
 		        zs.close();
-		        DeployPlugin.outputTextField.append("Successfully created VPK: " + Paths.get("", OUTPUT_ZIP_FILE).toAbsolutePath().toString()+ "\n\n");
+		        UIToolPlugin.outputTextField.append("Successfully created VPK: " + Paths.get("", OUTPUT_ZIP_FILE).toAbsolutePath().toString()+ "\n\n");
+		        System.out.println("Successfully created VPK: " + Paths.get("", OUTPUT_ZIP_FILE).toAbsolutePath().toString()+ "\n\n");
 	        }
 	        else {
 		        Files.deleteIfExists(outputPath);
-				DeployPlugin.outputTextField.append("No files were packaged. VPK was not created.\n\n");
+				UIToolPlugin.outputTextField.append("No files were packaged. VPK was not created.\n\n");
+				System.out.println("No files were packaged. VPK was not created.\n\n");
 		        zs.close();   
 	        }
 	        writtenBytesCount = 0;
     	}
 	    catch (Exception e) {
-	    	DeployPlugin.outputTextField.append("ERROR " + e.toString()+"\n\n");
+	    	UIToolPlugin.outputTextField.append("ERROR " + e.toString()+"\n\n");
+	    	System.out.println("ERROR " + e.toString()+"\n\n");
 	    }
 	}	
 
