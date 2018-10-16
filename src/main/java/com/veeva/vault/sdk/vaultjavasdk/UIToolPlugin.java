@@ -24,6 +24,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
+import com.veeva.vault.sdk.vaultjavasdk.utilities.VaultAPIService;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -86,7 +89,7 @@ public class UIToolPlugin extends AbstractMojo {
 	
 	//Log Output UI Panel
     private JPanel logOutputPanel  = new JPanel(new BorderLayout(5, 5));
-    protected static JTextArea outputTextField = new JTextArea();
+    public static JTextArea outputTextField = new JTextArea();
     private JScrollPane outputTextScrollPane;
     
     protected Image img = new ImageIcon(getClass().getResource("/veeva-icon.png")).getImage();
@@ -101,7 +104,7 @@ public class UIToolPlugin extends AbstractMojo {
 	@Parameter( property = "password", defaultValue = "" )
 	protected String password = "";
 	@Parameter( property = "source", defaultValue = "javasdk" )
-	protected String source = "";
+	protected String[] source;
 	
     public void execute() throws MojoExecutionException
     {  
@@ -228,9 +231,9 @@ public class UIToolPlugin extends AbstractMojo {
 							//Uploads the defined VPK to the specified Vault
 							String importSuccess = null;
 							
-							if (CreatePackage.getPackagePath() != null) {
-								System.out.println(CreatePackage.getPackagePath());
-								importSuccess = vaultClient.importPackage(CreatePackage.getPackagePath());
+							if (PackageManager.getPackagePath() != null) {
+								System.out.println(PackageManager.getPackagePath());
+								importSuccess = vaultClient.importPackage(PackageManager.getPackagePath());
 							}
 							else {
 								outputTextField.append("There is no vsdk_code_package.vpk in '<PROJECT_DIRECTORY>/deploy-vpk/code/'." + "\n\n");
@@ -286,7 +289,7 @@ public class UIToolPlugin extends AbstractMojo {
 						+ "Please select \"Package\" to zip up your source code "
 						+ "and \"Deploy\" to import/deploy the package to the specified vault.\n\n"
 					    + "---------------------------------------------------------------------------\n\n");
-	    		 JFileChooser choice = new JFileChooser(CreatePackage.getProjectPath()) {
+	    		 JFileChooser choice = new JFileChooser(PackageManager.getProjectPath()) {
 	    			    @Override
 	    			    protected JDialog createDialog( Component parent ) throws HeadlessException {
 	    			        JDialog dialog = super.createDialog( parent );
@@ -315,8 +318,8 @@ public class UIToolPlugin extends AbstractMojo {
 	    		      }
 	    		      
     			    try {
-	    		    	CreatePackage.createXMLFile(getUsername());  
-						CreatePackage.createZipFileArray(filePathArray);
+	    		    	PackageManager.createXMLFile(getUsername());  
+						PackageManager.createZipFileArray(filePathArray);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
