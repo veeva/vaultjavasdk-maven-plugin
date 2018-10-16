@@ -383,8 +383,6 @@ public class VaultAPIService {
 			{
 				deployResultsResponse = (DeployResultsType) parseAPIResponse(DeployResultsType);
 				
-				ErrorHandler.logErrors(deployResultsResponse);
-				
 				if (deployResultsResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 						deployResultsResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 					
@@ -403,6 +401,10 @@ public class VaultAPIService {
 			        System.out.println("Job Status API is: " + (String) deployResultsResponse.getField("responseStatus") + 
 			        		"\nDaily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
 			        		"\nBurst API Limit: "+ con.getHeaderField("X-VaultAPI-BurstLimitRemaining"));
+			        
+			        if (deployResultsResponse.responseDetails.package_status__v.contains("error")) {
+			        	System.out.println(deployResultsResponse.responseDetails.deployment_log.get(0).get("url"));
+			        }
 			        
 				}
 				else {
