@@ -103,6 +103,8 @@ public class UIToolPlugin extends AbstractMojo {
 	protected String username = "";
 	@Parameter( property = "password", defaultValue = "" )
 	protected String password = "";
+	@Parameter( property = "sessionId", defaultValue = "" )
+	protected String sessionId = "";
 	@Parameter( property = "source", defaultValue = "javasdk" )
 	protected String[] source;
 	
@@ -221,7 +223,7 @@ public class UIToolPlugin extends AbstractMojo {
 	        {
 	            public String doInBackground()
 	            {
-					VaultAPIService vaultClient = new VaultAPIService(apiVersion, vaultUrl, username, password);
+					VaultAPIService vaultClient = new VaultAPIService(apiVersion, vaultUrl, username, password, sessionId);
 					
 					try {
 						//Initializes an Authentication API connection.

@@ -17,8 +17,8 @@ import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.VaultAPIService;
 
 
-@Mojo( name = "deploy", requiresProject = false)
-public class DeployPlugin extends AbstractMojo {
+@Mojo( name = "import", requiresProject = false)
+public class ImportPlugin extends AbstractMojo {
 
 	protected static boolean authStatus;
 	
@@ -46,7 +46,7 @@ public class DeployPlugin extends AbstractMojo {
 			authStatus = vaultClient.initializeAPIConnection();
 			
 			if (authStatus == true) {
-				//Validates, uploads, and then deploys the defined VPK to the specified vault.
+				//Validates the defined VPK and then uploads it to the specified vault
 				String status = null;
 				
 				if (PackageManager.getPackagePath() != null) {
@@ -58,23 +58,6 @@ public class DeployPlugin extends AbstractMojo {
 				}
 				else {
 			        System.out.println("There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
-				}
-		
-				if (status != null) {
-					String job_id = vaultClient.deployPackage(status);
-					if (job_id != null) {
-						System.out.println("Deployment in progress...");
-						String jobStatus = "RUNNING";
-						while (jobStatus.contentEquals("RUNNING")) {
-							TimeUnit.SECONDS.sleep(10);
-							jobStatus = vaultClient.jobStatus(job_id);
-						}
-						
-						if (!jobStatus.contentEquals("RUNNING")) {
-							vaultClient.deployResults(jobStatus);
-						}
-					}
-					
 				}			
 			}
 		} catch (MalformedURLException e) {
@@ -95,15 +78,6 @@ public class DeployPlugin extends AbstractMojo {
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
 	}
-	
-    private String getUsername() {
-    	return username;
-    }
-
 }

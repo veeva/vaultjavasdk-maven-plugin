@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -14,19 +13,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.veeva.vault.sdk.vaultapi.responsetypes.AuthType;
-import com.veeva.vault.sdk.vaultapi.responsetypes.DeployType;
-import com.veeva.vault.sdk.vaultapi.responsetypes.ImportType;
-import com.veeva.vault.sdk.vaultapi.responsetypes.JobStatusType;
-import com.veeva.vault.sdk.vaultapi.responsetypes.DeployResultsType;
+import com.veeva.vault.sdk.vaultapi.responsetypes.*;
 import com.veeva.vault.sdk.vaultjavasdk.UIToolPlugin;
 import com.veeva.vault.sdk.vaultapi.responsetypes.GenericType;
+import com.veeva.vault.sdk.vaultapi.responsetypes.ValidatePackageType.PackageSteps;
 
 public class VaultAPIService {
 	
@@ -41,18 +38,25 @@ public class VaultAPIService {
 	private String password = null;
 	
 	private static HttpsURLConnection con = null;
+	private static Type GenericType = new TypeToken<GenericType>(){}.getType();
 	private static Type AuthType = new TypeToken<AuthType>(){}.getType();
 	private static Type ImportType = new TypeToken<ImportType>(){}.getType();
 	private static Type DeployType = new TypeToken<DeployType>(){}.getType();
 	private static Type JobStatusType = new TypeToken<JobStatusType>(){}.getType();
 	private static Type DeployResultsType = new TypeToken<DeployResultsType>(){}.getType();
+	private static Type ValidatePackageType = new TypeToken<ValidatePackageType>(){}.getType();
 	
 	
-	public VaultAPIService(String apiVersionInput, String urlInput, String usernameInput, String passwordInput) {
+	public VaultAPIService(String apiVersionInput, String urlInput, String usernameInput, String passwordInput, String sessionIdInput) {
 		apiVersion = apiVersionInput;
 		vaultUrl = urlInput;
 		username = usernameInput;
-		password = passwordInput;	
+		password = passwordInput;
+		currentSessionId= sessionIdInput;
+		
+		if (!currentSessionId.contentEquals("")) {
+			currentSessionTime = System.currentTimeMillis();
+		}
 	}
 	
 //Authenticates against the provided Vault URL, username, and password.	
@@ -78,9 +82,7 @@ public class VaultAPIService {
 		        //Checks for a valid HTTP response code and then parses the respnse content in Java objects.
 		        int responsecode = con.getResponseCode(); 
 				if (responsecode != 200){
-					UIToolPlugin.outputTextField.append("Connection failure with HttpResponseCode: " +responsecode + "\n\n");
-					System.out.println("Connection failure with HttpResponseCode: " +responsecode);
-//					throw new RuntimeException("HttpResponseCode: " +responsecode);	
+					System.out.println("Connection failure with HTTP response code: " +responsecode);
 				}
 				else
 				{
@@ -88,20 +90,14 @@ public class VaultAPIService {
 					if (authResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 						authResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 						
-						 UIToolPlugin.outputTextField.append(authResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) authResponse.getField("responseMessage")+ "\n\n");
-						 UIToolPlugin.outputTextField.append("Authentication Error: " + (String) authResponse.getField("responseMessage")+ "\n\n");
-						 UIToolPlugin.outputTextField.append("Errors:" + (String) authResponse.getErrors().toString()+ "\n\n");	
-						 
-						 System.out.println(authResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) authResponse.getField("responseMessage"));
-						 System.out.println("Authentication Error: " +  authResponse.getField("responseMessage"));
-						 System.out.println("Errors: " + authResponse.getErrors().toString());
+						ErrorHandler.logErrors(authResponse);
 					}
 					else if (authResponse instanceof AuthType){
 				        if (authResponse.getField("sessionId") != null){
 				        	System.out.println("Logged into host: " + vaultUrl + " as " + username);
 					        System.out.println("Session ID: " +  authResponse.getField("sessionId"));
+					        
 					        setCurrentSessionId((String) authResponse.getField("sessionId")); 
-					         UIToolPlugin.outputTextField.append("Success - Session ID: " +  authResponse.getField("sessionId") + "\n\n");
 					        currentSessionTime = System.currentTimeMillis();
 					        currentUserId = (String) authResponse.getField("userId"); ;
 					        
@@ -109,7 +105,6 @@ public class VaultAPIService {
 				        }
 				        else {
 				        	System.out.println("Failure - Session ID is null: " + (String) authResponse.getField("sessionId"));
-					        UIToolPlugin.outputTextField.append("Failure - Session ID is null: " + (String) authResponse.getField("sessionId") + "\n\n");
 					        setCurrentSessionId(null);
 					        currentUserId = null;
 				        }
@@ -136,19 +131,93 @@ public class VaultAPIService {
 			return false;	
 	}
 	
+	//Validates the VPK package defined by the "packagePath" variable against the defined vault.
+	public String validatePackage(String packagePath) throws MalformedURLException, ProtocolException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		ValidatePackageType validateResponse;
+	    byte[] postData = Files.readAllBytes(Paths.get(packagePath));
+	    
+	    System.out.println(postData.toString());
+
+	    try {
+	        URL myurl = new URL(vaultUrl  + apiVersion + "/services/package/actions/validate");
+	        con = (HttpsURLConnection) myurl.openConnection();
+	        con.setDoOutput(true);
+	        con.setDoInput(true);
+	        con.setRequestMethod("POST");
+	        con.setRequestProperty("Authorization", getCurrentSessionId());
+	        con.setRequestProperty("Content-Type", "");
+	        con.setRequestProperty("Accept", "application/json");
 	
-	//Initiates a bulk update to the Vault API up to the max batch size of 1000.
-	//Creates a CSV formatted string and converts it into a byte array for the PUT request. 
+	        try (DataOutputStream wr2 = new DataOutputStream(con.getOutputStream())) {
+	        	System.out.println("Validate Package Request: " + myurl + "\nFile: " + packagePath);
+	            wr2.write(postData);
+	            wr2.flush();
+	            wr2.close();
+	        }	
+	        
+	        //Checks for a valid HTTP response code and then parses the response content in Java objects.
+	        int responsecode = con.getResponseCode();
+	    	if (responsecode != 200){
+	    		System.out.println("Connection failure with HTTP response code: " +responsecode);
+				throw new RuntimeException("HttpResponseCode: " +responsecode);	
+			}
+			else
+			{
+				validateResponse = (ValidatePackageType) parseAPIResponse(ValidatePackageType);
+				
+				if (validateResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
+						validateResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
+					
+					ErrorHandler.logErrors(validateResponse);
+					
+					if (validateResponse.responseDetails.package_steps.size() > 0) {
+						for (PackageSteps packageSteps : validateResponse.responseDetails.package_steps) {
+							if (packageSteps.validation_response.contentEquals("FAILURE")) {
+								System.out.println(packageSteps.validation_message);
+								System.out.println(packageSteps.validation_errors.toString());
+							}
+						}
+						
+					}
+					
+					return null;
+				}
+				else if (validateResponse instanceof ValidatePackageType){
+			        currentSessionTime = System.currentTimeMillis();
+			        
+			        System.out.println("Daily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
+			        		"\nBurst API Limit: "+ con.getHeaderField("X-VaultAPI-BurstLimitRemaining"));
+			       
+					for (PackageSteps packageSteps : validateResponse.responseDetails.package_steps) {
+						if (packageSteps.validation_response.contentEquals("SUCCESS")) {
+							System.out.println(packageSteps.validation_message);
+					        System.out.println("Successfully validated [" + PackageManager.getPackagePath() + "]");
+						}
+					}
+			        return (String) validateResponse.getField("responseStatus");
+				}
+				else {
+					System.out.println("Invalid responseType object.");
+					return null;
+				}
+			}		        
+	       
+	    } finally {
+	    	if (con != null) {
+	    		con.disconnect();
+	    	}
+	    }	
+	    
+	}
+			
+	
+	//Imports the VPK package defined by the "packagePath" variable to the connected vault.
 	public String importPackage(String packagePath) throws MalformedURLException, ProtocolException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		ImportType importResponse;
-	    StringBuilder urlParameters = new StringBuilder();
-//		    packagePath = "C:\\Users\\nanoz\\eclipse-workspace\\vsdk-helloworld-deploy-test\\deploy-vpk\\vsdk-helloworld-code\\javasdk.zip";
 	    byte[] putData = Files.readAllBytes(Paths.get(packagePath));
 	    
 	    System.out.println(putData.toString());
 
-	  
-		    
 	    try {
 	        URL myurl = new URL(vaultUrl  + apiVersion + "/services/package");
 	        con = (HttpsURLConnection) myurl.openConnection();
@@ -160,9 +229,7 @@ public class VaultAPIService {
 	        con.setRequestProperty("Accept", "application/json");
 	
 	        try (DataOutputStream wr2 = new DataOutputStream(con.getOutputStream())) {
-	        	 UIToolPlugin.outputTextField.append("Upload Package Request: " + myurl + "\n"
-	        									  + "File: " + packagePath + "\n\n");
-	        	System.out.println("PUT to " + myurl + "\nFile: " + packagePath);
+	        	System.out.println("Import Package Request: " + myurl + "\nFile: " + packagePath);
 	            wr2.write(putData);
 	            wr2.flush();
 	            wr2.close();
@@ -171,7 +238,7 @@ public class VaultAPIService {
 	        //Checks for a valid HTTP response code and then parses the response content in Java objects.
 	        int responsecode = con.getResponseCode();
 	    	if (responsecode != 200){
-	    		System.out.println("Error - HttpResponseCode: " + responsecode  + " " + myurl);
+	    		System.out.println("Connection failure with HTTP response code: " +responsecode);
 				throw new RuntimeException("HttpResponseCode: " +responsecode);	
 			}
 			else
@@ -181,26 +248,15 @@ public class VaultAPIService {
 				if (importResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 						importResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 					
-					 UIToolPlugin.outputTextField.append(importResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) importResponse.getField("responseMessage") + "\n\n");
-					 UIToolPlugin.outputTextField.append("Package Import Error: " + (String) importResponse.getField("responseMessage")+ "\n\n");
-					 UIToolPlugin.outputTextField.append("Error Type:" + (String) importResponse.getField("errorType")+ "\n\n");	
-					
-					 System.out.println(importResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) importResponse.getField("responseMessage"));
-					 System.out.println("Package Import Error: "  + (String) importResponse.getField("responseMessage"));
-					 System.out.println("Error Type:" + (String) importResponse.getField("errorType"));	
-					
+					ErrorHandler.logErrors(importResponse);
 					return null;
 				}
 				else if (importResponse instanceof ImportType){
 			        currentSessionTime = System.currentTimeMillis();
 			        
-			         System.out.println("Bulk API is: " + (String) importResponse.getField("responseStatus") + 
-			        		"\nDaily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
+			         System.out.println("Daily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
 			        		"\nBurst API Limit: "+ con.getHeaderField("X-VaultAPI-BurstLimitRemaining"));
-			         UIToolPlugin.outputTextField.append("Package Upload SUCCESS: \n");
-			         UIToolPlugin.outputTextField.append(" * Package Name: " + (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("name") + 
-			        								  "\n * Package Id: " + ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id") + "\n\n");
-			        
+			       
 			         System.out.println("Successfully imported [" + PackageManager.getPackagePath() + "]");
 			         System.out.println("Package Name: " + (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("name"));
 			         System.out.println("Package Id: " + ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id"));
@@ -225,10 +281,6 @@ public class VaultAPIService {
 	//Initiates a VPK deployment against the provided package ID that exists in vault.
 	public String deployPackage(String packageId) throws MalformedURLException, ProtocolException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		DeployType deployResponse;
-	    StringBuilder urlParameters = new StringBuilder();
-//			    packagePath = "C:\\Users\\nanoz\\eclipse-workspace\\vsdk-helloworld-deploy-test\\deploy-vpk\\vsdk-helloworld-code\\javasdk.zip";
-	    byte[] putData = null;
-
 	    
 	    try {
 	        URL myurl = new URL(vaultUrl  + apiVersion + "/vobject/vault_package__v/" + packageId + "/actions/deploy" );
@@ -249,7 +301,7 @@ public class VaultAPIService {
 	        //Checks for a valid HTTP response code and then parses the response content in Java objects.
 	        int responsecode = con.getResponseCode();
 	    	if (responsecode != 200){
-	    		System.out.println("Error - HttpResponseCode: " + responsecode  + " " + myurl);
+	    		System.out.println("Connection failure with HTTP response code: " +responsecode);
 				throw new RuntimeException("HttpResponseCode: " +responsecode);	
 			}
 			else
@@ -259,22 +311,16 @@ public class VaultAPIService {
 				if (deployResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 						deployResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 					
-					 UIToolPlugin.outputTextField.append(deployResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) deployResponse.getField("responseMessage")+ "\n\n");
-					 UIToolPlugin.outputTextField.append("Package Deployment Error: " + (String) deployResponse.getField("responseMessage")+ "\n\n");
-					 UIToolPlugin.outputTextField.append("Error Type:" + (String) deployResponse.getErrors().toString()+ "\n\n");	
-					
-					 System.out.println(deployResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) deployResponse.getField("responseMessage"));
-					 System.out.println("Package Deployment Error: " + (String) deployResponse.getField("responseMessage"));
-					 System.out.println("Error Type:" + (String) deployResponse.getErrors().toString());	
+					ErrorHandler.logErrors(deployResponse);
 				}
 				else if (deployResponse instanceof DeployType){
 			        currentSessionTime = System.currentTimeMillis();
 			        
-			        System.out.println("Deploy Package API is: " + (String) deployResponse.getField("responseStatus") + 
+			        System.out.println("Deploy Package API." +
 			        		"\nDaily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
 			        		"\nBurst API Limit: "+ con.getHeaderField("X-VaultAPI-BurstLimitRemaining"));
-			        
 			        System.out.println("Started Deployment Job with Id: " + deployResponse.getField("job_id"));
+			        
 			        return (String) deployResponse.getField("job_id");
 				}
 				else {
@@ -307,7 +353,7 @@ public class VaultAPIService {
 	        //Checks for a valid HTTP response code and then parses the respnse content in Java objects.
 	        int responsecode = con.getResponseCode();
 	    	if (responsecode != 200){
-	    		System.out.println("Error - HttpResponseCode: " + responsecode  + " " + myurl);
+	    		System.out.println("Connection failure with HTTP response code: " +responsecode);
 				throw new RuntimeException("HttpResponseCode: " +responsecode);	
 			}
 			else
@@ -317,18 +363,12 @@ public class VaultAPIService {
 				if (jobStatusResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
 						jobStatusResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 					
-					 UIToolPlugin.outputTextField.append(jobStatusResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) jobStatusResponse.getField("responseMessage")+ "\n\n");
-					 UIToolPlugin.outputTextField.append("Package Deployment Error: " + (String) jobStatusResponse.getField("responseMessage")+ "\n\n");
-					 UIToolPlugin.outputTextField.append("Error Type:" + (String) jobStatusResponse.getErrors().toString()+ "\n\n");	
-					
-					 System.out.println(jobStatusResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) jobStatusResponse.getField("responseMessage")+ "\n\n");
-					 System.out.println("Package Deployment Error: " + (String) jobStatusResponse.getField("responseMessage"));
-					 System.out.println("Error Type:" + (String) jobStatusResponse.getErrors().toString());	
+					ErrorHandler.logErrors(jobStatusResponse);
 				}
 				else if (jobStatusResponse instanceof JobStatusType){
 			        currentSessionTime = System.currentTimeMillis();
 			        
-			        System.out.println("Job Status API is: " + (String) jobStatusResponse.getField("responseStatus") + 
+			        System.out.println("Job Status API" + 
 			        		"\nDaily API Limit: "+ con.getHeaderField("X-VaultAPI-DailyLimitRemaining") +
 			        		"\nBurst API Limit: "+ con.getHeaderField("X-VaultAPI-BurstLimitRemaining"));
 			        
@@ -376,7 +416,7 @@ public class VaultAPIService {
 	        //Checks for a valid HTTP response code and then parses the respnse content in Java objects.
 	        int responsecode = con.getResponseCode();
 	    	if (responsecode != 200){
-	    		System.out.println("Error - HttpResponseCode: " + responsecode  + " " + myurl);
+	    		System.out.println("Connection failure with HTTP response code: " +responsecode);
 				throw new RuntimeException("HttpResponseCode: " +responsecode);	
 			}
 			else
@@ -384,16 +424,9 @@ public class VaultAPIService {
 				deployResultsResponse = (DeployResultsType) parseAPIResponse(DeployResultsType);
 				
 				if (deployResultsResponse.getField("responseStatus").toString().toUpperCase().contains("FAILURE")||
-						deployResultsResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
+				    deployResultsResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 					
 					 ErrorHandler.logErrors(deployResultsResponse);
-//					 UIToolPlugin.outputTextField.append(deployResultsResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) deployResultsResponse.getField("responseMessage")+ "\n\n");
-//					 UIToolPlugin.outputTextField.append("Package Deployment Error: " + (String) deployResultsResponse.getField("responseMessage")+ "\n\n");
-//					 UIToolPlugin.outputTextField.append("Error Type:" + (String) deployResultsResponse.getErrors().toString()+ "\n\n");	
-//					
-//					 System.out.println(deployResultsResponse.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) deployResultsResponse.getField("responseMessage")+ "\n\n");
-//					 System.out.println("Package Deployment Error: " + (String) deployResultsResponse.getField("responseMessage"));
-//					 System.out.println("Error Type:" + (String) deployResultsResponse.getErrors().toString());	
 				}
 				else if (deployResultsResponse instanceof DeployResultsType){
 			        currentSessionTime = System.currentTimeMillis();

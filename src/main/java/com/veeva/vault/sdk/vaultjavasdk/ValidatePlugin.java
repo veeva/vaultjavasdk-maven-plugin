@@ -1,11 +1,8 @@
 package com.veeva.vault.sdk.vaultjavasdk;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -17,8 +14,8 @@ import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.VaultAPIService;
 
 
-@Mojo( name = "deploy", requiresProject = false)
-public class DeployPlugin extends AbstractMojo {
+@Mojo( name = "validate", requiresProject = false)
+public class ValidatePlugin extends AbstractMojo {
 
 	protected static boolean authStatus;
 	
@@ -40,41 +37,23 @@ public class DeployPlugin extends AbstractMojo {
 		apiVersion = "/api/" + apiVersion;
 		VaultAPIService vaultClient = new VaultAPIService(apiVersion, vaultUrl, username, password, sessionId);
 		
-		
 		try {
 			//Initializes an Authentication API connection.
-			authStatus = vaultClient.initializeAPIConnection();
+			
+			while (authStatus == false) {
+				authStatus = vaultClient.verifySession();
+			}
+//			authStatus = vaultClient.initializeAPIConnection();
 			
 			if (authStatus == true) {
-				//Validates, uploads, and then deploys the defined VPK to the specified vault.
+				//Validates the defined VPK against the specified vault.
 				String status = null;
 				
 				if (PackageManager.getPackagePath() != null) {
 					status = vaultClient.validatePackage(PackageManager.getPackagePath());
-					
-					if (status != null) {
-						status = vaultClient.importPackage(PackageManager.getPackagePath());
-					}
 				}
 				else {
 			        System.out.println("There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
-				}
-		
-				if (status != null) {
-					String job_id = vaultClient.deployPackage(status);
-					if (job_id != null) {
-						System.out.println("Deployment in progress...");
-						String jobStatus = "RUNNING";
-						while (jobStatus.contentEquals("RUNNING")) {
-							TimeUnit.SECONDS.sleep(10);
-							jobStatus = vaultClient.jobStatus(job_id);
-						}
-						
-						if (!jobStatus.contentEquals("RUNNING")) {
-							vaultClient.deployResults(jobStatus);
-						}
-					}
-					
 				}			
 			}
 		} catch (MalformedURLException e) {
@@ -95,15 +74,6 @@ public class DeployPlugin extends AbstractMojo {
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
 	}
-	
-    private String getUsername() {
-    	return username;
-    }
-
 }

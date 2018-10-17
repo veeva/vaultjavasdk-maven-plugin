@@ -6,7 +6,7 @@ import java.util.Map;
 //Object skeleton for the Error JSON responses.
 @SuppressWarnings("unused")
 public class ErrorType<T> extends GenericType<Object>{
-	private ArrayList<Map<String,String>> errors;
+	private ArrayList<Map<String,String>> errors = new ArrayList<Map<String,String>>();
 	private String errorType;
 	
 	public ArrayList<Map<String,String>> getErrors(){

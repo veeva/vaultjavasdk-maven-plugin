@@ -28,10 +28,12 @@ public class ErrorHandler {
 	
 	public static void logErrors(ErrorType<?> response) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		
-		 System.out.println(response.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) response.getField("responseMessage")+ "\n\n");
-		 System.out.println("Package Deployment Error: " + (String) response.getField("responseMessage"));
-		 System.out.println("Error Type:" + (String) response.getErrors().toString());	
-		
+		 System.out.println(response.getField("responseStatus").toString().toUpperCase() + " Error: " + (String) response.getField("responseMessage"));
+		 System.out.println("Error Type: " + (String) response.getField("errorType"));	
+		 
+		 if (response.getErrors().size() > 0 ) {
+			 System.out.println("Errors: " + response.getErrors().toString());	
+		 }
 	}
 }
 
