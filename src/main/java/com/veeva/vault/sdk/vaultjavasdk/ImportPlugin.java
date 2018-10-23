@@ -43,7 +43,7 @@ public class ImportPlugin extends AbstractMojo {
 		
 		try {
 			//Initializes an Authentication API connection.
-			authStatus = vaultClient.initializeAPIConnection();
+			authStatus = vaultClient.verifySession();
 			
 			if (authStatus == true) {
 				//Validates the defined VPK and then uploads it to the specified vault

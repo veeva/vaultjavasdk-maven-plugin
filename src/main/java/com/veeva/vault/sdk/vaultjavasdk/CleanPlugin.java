@@ -32,7 +32,7 @@ public class CleanPlugin extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		
 		if (PackageManager.cleanPackageDirectory()) {
-			System.out.println("Deployment folder deleted.");
+			System.out.println("Deployment folder contents deleted.");
 		}
 
 	}

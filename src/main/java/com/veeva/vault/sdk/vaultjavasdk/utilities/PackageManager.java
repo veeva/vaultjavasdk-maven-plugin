@@ -34,7 +34,6 @@ public class PackageManager {
 	
 
 	public static String getProjectPath() {
-		System.out.println("Project Directory: " + PROJECT_DIRECTORY.toAbsolutePath().getFileName().toString());
 		return PROJECT_DIRECTORY.toAbsolutePath().toString();
 	}
 	

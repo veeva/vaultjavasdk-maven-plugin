@@ -40,10 +40,7 @@ public class ValidatePlugin extends AbstractMojo {
 		try {
 			//Initializes an Authentication API connection.
 			
-			while (authStatus == false) {
-				authStatus = vaultClient.verifySession();
-			}
-//			authStatus = vaultClient.initializeAPIConnection();
+			authStatus = vaultClient.verifySession();
 			
 			if (authStatus == true) {
 				//Validates the defined VPK against the specified vault.

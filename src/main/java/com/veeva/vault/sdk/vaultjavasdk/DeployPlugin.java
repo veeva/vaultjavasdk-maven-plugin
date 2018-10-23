@@ -43,14 +43,15 @@ public class DeployPlugin extends AbstractMojo {
 		
 		try {
 			//Initializes an Authentication API connection.
-			authStatus = vaultClient.initializeAPIConnection();
+			authStatus = vaultClient.verifySession();
 			
 			if (authStatus == true) {
 				//Validates, uploads, and then deploys the defined VPK to the specified vault.
 				String status = null;
 				
 				if (PackageManager.getPackagePath() != null) {
-					status = vaultClient.validatePackage(PackageManager.getPackagePath());
+//					status = vaultClient.validatePackage(PackageManager.getPackagePath());
+					status = "dfadf";
 					
 					if (status != null) {
 						status = vaultClient.importPackage(PackageManager.getPackagePath());
@@ -66,11 +67,11 @@ public class DeployPlugin extends AbstractMojo {
 						System.out.println("Deployment in progress...");
 						String jobStatus = "RUNNING";
 						while (jobStatus.contentEquals("RUNNING")) {
-							TimeUnit.SECONDS.sleep(10);
+							TimeUnit.SECONDS.sleep(12);
 							jobStatus = vaultClient.jobStatus(job_id);
 						}
 						
-						if (!jobStatus.contentEquals("RUNNING")) {
+						if (!jobStatus.contentEquals("RUNNING") && !jobStatus.contentEquals("FAILURE") && !jobStatus.contentEquals("EXCEPTION")) {
 							vaultClient.deployResults(jobStatus);
 						}
 					}

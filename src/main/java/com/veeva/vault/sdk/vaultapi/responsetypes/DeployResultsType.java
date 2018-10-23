@@ -22,12 +22,4 @@ public class DeployResultsType extends ErrorType<Object>{
 		public ArrayList<Map<String,String>> deployment_log;
 		
 	}
-//	
-//	public class StatusLink extends ErrorType<Object>{
-//		public String rel;
-//		public String href;
-//		public String method;
-//		public String accept;	
-//	}
-
 }
