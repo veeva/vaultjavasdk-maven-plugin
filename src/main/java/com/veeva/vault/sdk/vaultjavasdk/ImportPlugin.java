@@ -57,7 +57,7 @@ public class ImportPlugin extends AbstractMojo {
 					}
 				}
 				else {
-			        System.out.println("There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
+			        System.out.println("Cannot deploy package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
 				}			
 			}
 		} catch (MalformedURLException e) {

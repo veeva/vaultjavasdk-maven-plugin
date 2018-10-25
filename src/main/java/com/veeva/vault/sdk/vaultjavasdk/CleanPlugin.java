@@ -34,6 +34,9 @@ public class CleanPlugin extends AbstractMojo {
 		if (PackageManager.cleanPackageDirectory()) {
 			System.out.println("Deployment folder contents deleted.");
 		}
+		else {
+			System.out.println("Deployment folder contents could not be deleted.");
+		}
 
 	}
 	

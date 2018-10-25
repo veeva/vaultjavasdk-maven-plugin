@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class PackageManager {
 	private static final String CURRENT_DATE = java.time.LocalDate.now().toString();
 	private static int ZIP_FILE_INCREMENT = 1;
 	private static String OUTPUT_FILE_PATH = "deployment/packages/";
-	private static String OUTPUT_FILE_NAME = "code_deployment";
+	private static String OUTPUT_FILE_NAME = "code_package";
 	private static OutputPackageFormat OUTPUT_ZIP_FILE = new OutputPackageFormat(OUTPUT_FILE_PATH);
 	private static final String OUTPUT_XML_FILE = "deployment/vaultpackage.xml";
 	private static Path PROJECT_DIRECTORY = Paths.get("");
@@ -41,7 +42,7 @@ public class PackageManager {
 		String sourcePath = "";
 		
 		if (source != null) {
-			sourcePath = source.replaceAll(".", "/");
+			sourcePath = source.replaceAll("\\.", "/");
 		}
 		
 		Path path = Paths.get("", "javasdk/src/main/java/" + sourcePath);
@@ -76,11 +77,12 @@ public class PackageManager {
 					}
 			});
 			fileWalk.close();
-			deleted = Files.deleteIfExists(Paths.get("", "deployment/packages"));
+
 		} catch (IOException e) {
 			System.out.println("ERROR " + e.toString()+"\n\n");
+			return false;
 		}
-		return deleted;
+		return true;
 	}
 	
 	//Create the required "vaultpackage.xml" file for the VPK. The specifies a default deployment option of "incremental".
@@ -104,9 +106,11 @@ public class PackageManager {
 		tmp.getParentFile().mkdirs();
 		
 		try {
-			Files.deleteIfExists(Paths.get("", OUTPUT_XML_FILE));
-			Path file = Files.createFile(Paths.get("", OUTPUT_XML_FILE));
-			Files.write(file, lines, Charset.forName("UTF-8"));
+//			Files.deleteIfExists(Paths.get("", OUTPUT_XML_FILE));
+			if (!Files.exists(Paths.get("", OUTPUT_XML_FILE))) {
+				Path file = Files.createFile(Paths.get("", OUTPUT_XML_FILE));
+				Files.write(file, lines, Charset.forName("UTF-8"));
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -136,15 +140,6 @@ public class PackageManager {
 	    try (ZipArchiveOutputStream zs = new ZipArchiveOutputStream(Files.newOutputStream(outputPath,StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
 	    	zs.setCreateUnicodeExtraFields(UnicodeExtraFieldPolicy.ALWAYS);
 	    	ZipArchiveEntry zipXMLEntry = new ZipArchiveEntry("vaultpackage.xml");
-	          try {
-	                zs.putArchiveEntry(zipXMLEntry);
-	                writtenBytesCount += Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
-		        	UIToolPlugin.outputTextField.append("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString() + "\n\n");
-		            System.out.println("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
-	                zs.closeArchiveEntry();
-	          } catch (IOException e) {
-	                System.err.println(e);
-	          }
 	          
 	  		for (String line : pathToZip) {
 				Path path = Paths.get(line);  
@@ -189,12 +184,22 @@ public class PackageManager {
 				                writtenBytesCount += Files.copy(p, zs);
 				                zs.closeArchiveEntry();
 				          } catch (IOException e) {
-				                System.err.println(e);
+				                System.out.println(e);
 				          }
 					});
 				}
 		    	fileWalk.close();
 	  		}
+	  		
+	  		try {
+                zs.putArchiveEntry(zipXMLEntry);
+                writtenBytesCount += Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
+	        	UIToolPlugin.outputTextField.append("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString() + "\n\n");
+	            System.out.println("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
+                zs.closeArchiveEntry();
+            } catch (IOException e) {
+                System.err.println(e);
+            }
 	  		
 	        zs.flush();
 	        System.out.println(writtenBytesCount + " bytes written to VPK.");
@@ -213,7 +218,11 @@ public class PackageManager {
     	}
 	    catch (Exception e) {
 	    	UIToolPlugin.outputTextField.append("ERROR " + e.toString()+"\n\n");
-	    	System.out.println("ERROR " + e.toString()+"\n\n");
+	    	System.out.println("ERROR " + e.toString());
+	    	
+	        Files.deleteIfExists(outputPath);
+			UIToolPlugin.outputTextField.append("No files were packaged. VPK was not created.\n\n");
+			System.out.println("No files were packaged. VPK was not created.\n\n");  
 	    }
 	}	
 

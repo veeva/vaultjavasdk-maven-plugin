@@ -17,8 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -55,7 +53,7 @@ public class VaultAPIService {
 	
 	public VaultAPIService(String apiVersionInput, String urlInput, String usernameInput, String passwordInput, String sessionIdInput) {
 		apiVersion = apiVersionInput;
-		vaultUrl = urlInput;
+		vaultUrl = "https://" + urlInput;
 		username = usernameInput;
 		password = passwordInput;
 		currentSessionId= sessionIdInput;
@@ -373,7 +371,7 @@ public class VaultAPIService {
 			        	
 			        }
 			        else if (jobStatusResponse.data.status.contains("RUNNING")){
-			        	System.out.print("...");
+//			        	System.out.print("...");
 			        	return jobStatusResponse.data.status;
 			        }
 			        else {
