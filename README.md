@@ -17,6 +17,7 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 
 To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration parameters can be set either the pom.xml or as parameters when running the goals:
 
+```
     <build>    
         <plugins>
         	<plugin>
@@ -36,9 +37,11 @@ To make the Maven plugin available in a Vault Java SDK project, add the followin
         	</plugin>
         </plugins>
     </build>    
+```
 
 Configuration Parameters:    
 
+```
 <vaultUrl> - a vault’s DNS host name
 <userName> - the Vault user name to use for authentication required for using the import, deploy, and validate goals
 <password> - the password for user specified above. 
@@ -46,31 +49,30 @@ Configuration Parameters:
 <apiVerision> - optional, defaults to v18.3
 <source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters; the parameter can be named anything.
 	<packages> - name of packages in the project
-		<package> - package name; “*” may be use to indicate all subpackages.
-	<classes> - name of specific java files
-		<class> - FQCN
+	<classes> - fully qualified name of specific java files
+```
 
 ## Maven Goals 
 
 The following goals are provided by the plugin.
 
-* vaultjavasdk:clean - removes all files in the “deployment” folder in the maven project. This folder contains VPK files and vaultpackage.xml file created by this plugin. 
+* **vaultjavasdk:clean** - removes all files in the “deployment” folder in the maven project. This folder contains VPK files and vaultpackage.xml file created by this plugin. 
 
-* vaultjavasdk:package - generates a VPK file in the "deployment/packages" directory. 
+* **vaultjavasdk:package** - generates a VPK file in the "deployment/packages" directory. 
     * VPK file name format: code_package_{mm-dd-yyyy}_{num}.vpk
     * If the directory does not exist, it will be created.
     * If a VPK already exists, increment {mm-dd-yyyy} and/or {num} 
     * Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
 
-* vaultjavasdk:validate - validates the last modified VPK in the "deployment/packages" directory against the [validation endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
+* **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [validation endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
 
-* vaultjavasdk:import - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
+* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
 
-* vaultjavasdk:deploy - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
+* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
 
 ## How to run
 
-You can either setup the goals in your IDE or run them directly through the Maven command line. The following example is for running the "deploy" goal through the command line when the parameters are not configured in the pom.xml:
+You can either setup the goals in your IDE or run them directly through the Maven command line. The following example is for running the **deploy** goal through the command line when the parameters are not configured in the pom.xml:
 
-mvn vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
+> mvn vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
     
