@@ -38,11 +38,17 @@ public class PackagePlugin extends AbstractMojo {
 		
 		if (Files.exists(Paths.get("", "javasdk/src/main/java/"))) {
 			
+			System.out.println(source.toString());
 		    for (String x : source) {
+		    	System.out.println(x);
 		    	if (!x.equals("")) {
 				    String filePath = PackageManager.getSourcePath(x);
 				    filePathArray.add(filePath);
 		    	}
+		    }
+		    if (source.length == 0) {
+			    String filePath = PackageManager.getSourcePath("");
+			    filePathArray.add(filePath);
 		    }
  
 		    try {
@@ -50,7 +56,7 @@ public class PackagePlugin extends AbstractMojo {
 				PackageManager.createZipFileArray(filePathArray);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Packaging error:" + e.toString());
 			}
 		}
 		else {

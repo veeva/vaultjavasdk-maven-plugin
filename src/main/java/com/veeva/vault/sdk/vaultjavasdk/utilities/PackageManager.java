@@ -18,8 +18,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream.UnicodeExtraFieldPolicy;
 
-import com.veeva.vault.sdk.vaultjavasdk.UIToolPlugin;
-
 import java.nio.file.StandardOpenOption;
 
 public class PackageManager {
@@ -39,13 +37,26 @@ public class PackageManager {
 	}
 	
 	public static String getSourcePath(String source) {
-		String sourcePath = "";
+		Path path;
+		final String sourcePath;
 		
 		if (source != null) {
 			sourcePath = source.replaceAll("\\.", "/");
+			path = Paths.get("", "javasdk/src/main/java/" + sourcePath);
+		}
+		else {
+			sourcePath = "";
+			path = Paths.get("", "javasdk/src/main/java/");
 		}
 		
-		Path path = Paths.get("", "javasdk/src/main/java/" + sourcePath);
+		if (!Files.isDirectory(path)) {
+			File dir = new File(path.getParent().toAbsolutePath().toString());
+			for(String fileName : dir.list()) {
+				if (fileName.toLowerCase().contains(path.getFileName().toString().toLowerCase())) {
+					path = Paths.get(path.getParent().toString() + "/" + fileName);
+				}
+			}
+		}
 	
 		System.out.println("Source Path: " + path.toAbsolutePath().toString());
 		return path.toAbsolutePath().toString();
@@ -143,13 +154,11 @@ public class PackageManager {
 	          
 	  		for (String line : pathToZip) {
 				Path path = Paths.get(line);  
+				
 				Stream<Path> fileWalk = Files.walk(path);
 				List<Path> fileList = fileWalk.filter(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") && !Files.isDirectory(pp)).collect(Collectors.toList());
 				
-				if (fileList.size() == 0) {
-					UIToolPlugin.outputTextField.append("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
-							+ "\n\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.\n\n");
-					
+				if (fileList.size() == 0) {				
 					System.out.println("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
 							+ "\n\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.");
 				}
@@ -159,7 +168,6 @@ public class PackageManager {
 			        	  Iterator<Path> iterate = p.iterator();
 			        	  int startSequence = 0;
 			        	  int endSequence = p.getNameCount();
-			        	  long count;
 			        	  
 			        	  while (iterate.hasNext()) {
 			        		  Path name = iterate.next();
@@ -175,14 +183,14 @@ public class PackageManager {
 			        			  startSequence += 1;
 			        		  }
 			        	  }		        	  
-			        	  UIToolPlugin.outputTextField.append("Adding file to package: " + p.toString() + "\n\n");
-			        	  System.out.println("Adding file to package: " + p.toString());
 			        	        	  
 			        	  ZipArchiveEntry zipEntry = new ZipArchiveEntry("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
 				          try {
 				                zs.putArchiveEntry(zipEntry);
 				                writtenBytesCount += Files.copy(p, zs);
 				                zs.closeArchiveEntry();
+
+					        	System.out.println("Adding file to package: " + p.toString());
 				          } catch (IOException e) {
 				                System.out.println(e);
 				          }
@@ -193,35 +201,29 @@ public class PackageManager {
 	  		
 	  		try {
                 zs.putArchiveEntry(zipXMLEntry);
-                writtenBytesCount += Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
-	        	UIToolPlugin.outputTextField.append("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString() + "\n\n");
-	            System.out.println("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
+                Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
+	        	System.out.println("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
                 zs.closeArchiveEntry();
             } catch (IOException e) {
                 System.err.println(e);
             }
 	  		
 	        zs.flush();
-	        System.out.println(writtenBytesCount + " bytes written to VPK.");
 	        if (writtenBytesCount > 0) {
 		        zs.close();
-		        UIToolPlugin.outputTextField.append("Package file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n\n");
 		        System.out.println("Package file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n\n");
 	        }
 	        else {
 		        Files.deleteIfExists(outputPath);
-				UIToolPlugin.outputTextField.append("No files were packaged. VPK was not created.\n\n");
 				System.out.println("No files were packaged. VPK was not created.\n\n");
 		        zs.close();   
 	        }
 	        writtenBytesCount = 0;
     	}
 	    catch (Exception e) {
-	    	UIToolPlugin.outputTextField.append("ERROR " + e.toString()+"\n\n");
 	    	System.out.println("ERROR " + e.toString());
 	    	
 	        Files.deleteIfExists(outputPath);
-			UIToolPlugin.outputTextField.append("No files were packaged. VPK was not created.\n\n");
 			System.out.println("No files were packaged. VPK was not created.\n\n");  
 	    }
 	}	

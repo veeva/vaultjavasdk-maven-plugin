@@ -24,7 +24,6 @@ import javax.net.ssl.HttpsURLConnection;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.veeva.vault.sdk.vaultapi.responsetypes.*;
-import com.veeva.vault.sdk.vaultjavasdk.UIToolPlugin;
 import com.veeva.vault.sdk.vaultapi.responsetypes.GenericType;
 import com.veeva.vault.sdk.vaultapi.responsetypes.ValidatePackageType.PackageSteps;
 
@@ -114,17 +113,14 @@ public class VaultAPIService {
 				        }
 					}
 					else {
-						 UIToolPlugin.outputTextField.append("Invalid responseType object.\n\n");
 						 System.out.println("Invalid responseType object.");
 					}
 				}
 		
 		    } catch (UnknownHostException e){
-		    	 UIToolPlugin.outputTextField.append(e.toString() + "\n\n");
 		    	System.out.println(e.toString());
 		    }
 		    catch (IOException e){
-		    	 UIToolPlugin.outputTextField.append(e.toString() + "\n\n");
 		    	System.out.println(e.toString());
 		    }
 		    finally {

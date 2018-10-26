@@ -50,8 +50,7 @@ public class DeployPlugin extends AbstractMojo {
 				String status = null;
 				
 				if (PackageManager.getPackagePath() != null) {
-//					status = vaultClient.validatePackage(PackageManager.getPackagePath());
-					status = "dfadf";
+					status = vaultClient.validatePackage(PackageManager.getPackagePath());
 					
 					if (status != null) {
 						status = vaultClient.importPackage(PackageManager.getPackagePath());
