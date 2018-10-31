@@ -19,7 +19,7 @@ public class Source {
 		ArrayList<String> classesOutput = new ArrayList<String>();
 		for (String x : classes) {
 			if (x != null) {
-				classesOutput.add(x);
+				classesOutput.add(x.trim());
 			}
 		}
 		return classesOutput;
@@ -37,7 +37,7 @@ public class Source {
 		ArrayList<String> packagesOutput = new ArrayList<String>();
 		for (String x : packages) {
 			if (x != null) {
-				packagesOutput.add(x);
+				packagesOutput.add(x.trim());
 			}
 		}
 		return packagesOutput;
