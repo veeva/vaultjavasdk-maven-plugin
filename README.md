@@ -18,6 +18,16 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration parameters can be set either the pom.xml or as parameters when running the goals:
 
 ```
+
+	  <properties>
+     		<vaultUrl>vaulturl.veevavault.com</vaultUrl>
+    		<username>user@test.com</username>
+    		<password>xxxxxxx</password>
+    		<sessionId></sessionId>
+    		<source.packages></source.packages>
+    		<source.classes></source.classes>
+    </properties>
+    
     <build>    
         <plugins>
         	<plugin>
@@ -25,12 +35,13 @@ To make the Maven plugin available in a Vault Java SDK project, add the followin
 	        	<artifactId>vaultjavasdk-maven-plugin</artifactId>
 	        	<version>1.0.0</version>
 	        	<configuration>
-	        		<vaultUrl><vault-url>.veevavault.com</vaultUrl>
-	        		<username>user@example.com</username>
-	        		<password></password>
-	        		<sessionId></sessionId>
+	        		<vaultUrl>${vaultUrl}</vaultUrl>
+	        		<username>${username}</username>
+	        		<password>${password}</password>
+	        		<sessionId>${sessionId}</sessionId>
 	        		<source>
-	        			<param1></param1>
+	        			<packages>${source.packages}</packages>
+	        			<classes>${source.classes}</classes>
 	        		</source>
 	        		<apiVersion>v18.3</apiVersion>
 	        	</configuration>
@@ -48,8 +59,8 @@ Configuration Parameters:
 <sessionId> - optional, an authenticated live user session id used instead of providing userName/password credentials
 <apiVerision> - optional, defaults to v18.3
 <source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters; the parameter can be named anything.
-	<packages> - name of packages in the project
-	<classes> - fully qualified name of specific java files
+	<packages> - comma separated list of package names from the project
+	<classes> - comma separated list of fully qualified java file names
 ```
 
 ## Maven Goals 

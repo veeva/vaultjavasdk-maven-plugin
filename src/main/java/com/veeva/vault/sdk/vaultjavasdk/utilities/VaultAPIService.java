@@ -135,7 +135,7 @@ public class VaultAPIService {
 	public String validatePackage(String packagePath) throws MalformedURLException, ProtocolException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		ValidatePackageType validateResponse;
 	    byte[] postData = Files.readAllBytes(Paths.get(packagePath));
-
+	    	    
 	    try {
 	        URL myurl = new URL(vaultUrl  + apiVersion + "/services/package/actions/validate");
 	        con = (HttpsURLConnection) myurl.openConnection();
@@ -147,7 +147,7 @@ public class VaultAPIService {
 	        con.setRequestProperty("Accept", "application/json");
 	
 	        try (DataOutputStream wr2 = new DataOutputStream(con.getOutputStream())) {
-	        	System.out.println("Validate Package Request: " + myurl + "\nFile: " + packagePath);
+	        	System.out.println("Validate Package Request: " + myurl + "\nPackage: " + packagePath);
 	            wr2.write(postData);
 	            wr2.flush();
 	            wr2.close();
@@ -213,7 +213,7 @@ public class VaultAPIService {
 	public String importPackage(String packagePath) throws MalformedURLException, ProtocolException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		ImportType importResponse;
 	    byte[] putData = Files.readAllBytes(Paths.get(packagePath));
-
+	    
 	    try {
 	        URL myurl = new URL(vaultUrl  + apiVersion + "/services/package");
 	        con = (HttpsURLConnection) myurl.openConnection();
@@ -225,7 +225,7 @@ public class VaultAPIService {
 	        con.setRequestProperty("Accept", "application/json");
 	
 	        try (DataOutputStream wr2 = new DataOutputStream(con.getOutputStream())) {
-	        	System.out.println("Import Package Request: " + myurl + "\nFile: " + packagePath);
+	        	System.out.println("Import Package Request: " + myurl + "\nPackage: " + packagePath);
 	            wr2.write(putData);
 	            wr2.flush();
 	            wr2.close();
@@ -516,7 +516,7 @@ public class VaultAPIService {
                 content.append(System.lineSeparator());
             }
         }
-        System.out.println(content.toString());
+//        System.out.println(content.toString());
         return new Gson().fromJson(content.toString(), type);
 	}
 	

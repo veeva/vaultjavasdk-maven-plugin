@@ -211,7 +211,7 @@ public class PackageManager {
 	        zs.flush();
 	        if (writtenBytesCount > 0) {
 		        zs.close();
-		        System.out.println("Package file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n\n");
+		        System.out.println("Package file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n");
 	        }
 	        else {
 		        Files.deleteIfExists(outputPath);

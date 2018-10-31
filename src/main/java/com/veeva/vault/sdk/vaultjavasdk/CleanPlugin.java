@@ -25,8 +25,10 @@ public class CleanPlugin extends AbstractMojo {
 	protected String username = "";
 	@Parameter( property = "password", defaultValue = "" )
 	protected String password = "";
+	@Parameter( property = "sessionId", defaultValue = "" )
+	protected String sessionId = "";
 	@Parameter( property = "source", defaultValue = "" )
-	protected String[] source;
+	protected Source source;
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {

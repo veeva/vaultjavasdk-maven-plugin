@@ -33,7 +33,7 @@ public class DeployPlugin extends AbstractMojo {
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
 	@Parameter( property = "source", defaultValue = "javasdk" )
-	protected String[] source;
+	protected Source source;
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -48,9 +48,11 @@ public class DeployPlugin extends AbstractMojo {
 			if (authStatus == true) {
 				//Validates, uploads, and then deploys the defined VPK to the specified vault.
 				String status = null;
+				System.out.println("");
 				
 				if (PackageManager.getPackagePath() != null) {
 					status = vaultClient.validatePackage(PackageManager.getPackagePath());
+					System.out.println("");
 					
 					if (status != null) {
 						status = vaultClient.importPackage(PackageManager.getPackagePath());
@@ -61,6 +63,7 @@ public class DeployPlugin extends AbstractMojo {
 				}
 		
 				if (status != null) {
+					System.out.println("");
 					String job_id = vaultClient.deployPackage(status);
 					if (job_id != null) {
 						System.out.println("Deployment in progress...");
@@ -71,6 +74,7 @@ public class DeployPlugin extends AbstractMojo {
 						}
 						
 						if (!jobStatus.contentEquals("RUNNING") && !jobStatus.contentEquals("FAILURE") && !jobStatus.contentEquals("EXCEPTION")) {
+							System.out.println("");
 							vaultClient.deployResults(jobStatus);
 						}
 					}

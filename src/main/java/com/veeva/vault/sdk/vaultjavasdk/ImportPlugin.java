@@ -33,7 +33,7 @@ public class ImportPlugin extends AbstractMojo {
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
 	@Parameter( property = "source", defaultValue = "javasdk" )
-	protected String[] source;
+	protected Source source;
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -47,12 +47,14 @@ public class ImportPlugin extends AbstractMojo {
 			
 			if (authStatus == true) {
 				//Validates the defined VPK and then uploads it to the specified vault
+				System.out.println("");
 				String status = null;
 				
 				if (PackageManager.getPackagePath() != null) {
 					status = vaultClient.validatePackage(PackageManager.getPackagePath());
 					
 					if (status != null) {
+						System.out.println("");
 						status = vaultClient.importPackage(PackageManager.getPackagePath());
 					}
 				}

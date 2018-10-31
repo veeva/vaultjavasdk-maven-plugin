@@ -27,31 +27,30 @@ public class PackagePlugin extends AbstractMojo {
 	protected String username = "";
 	@Parameter( property = "password", defaultValue = "" )
 	protected String password = "";
+	@Parameter( property = "sessionId", defaultValue = "" )
+	protected String sessionId = "";
 	@Parameter( property = "source", defaultValue = "" )
-	protected String[] source;
+	protected Source source = new Source();
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		
 	    ArrayList<String> filePathArray = new ArrayList<String>();
-
 		
 		if (Files.exists(Paths.get("", "javasdk/src/main/java/"))) {
 			
-			System.out.println(source.toString());
-		    for (String x : source) {
-		    	System.out.println(x);
-		    	if (!x.equals("")) {
-				    String filePath = PackageManager.getSourcePath(x);
-				    filePathArray.add(filePath);
-		    	}
-		    }
-		    if (source.length == 0) {
-			    String filePath = PackageManager.getSourcePath("");
-			    filePathArray.add(filePath);
-		    }
+			if (source.getSource() != null) {
+				
+			    for (String x : source.getSource()) {
+			    	if (x != null) {
+					    String filePath = PackageManager.getSourcePath(x);
+					    filePathArray.add(filePath);
+			    	}
+			    }
+			}
  
 		    try {
+		    	System.out.println("");
 		    	PackageManager.createXMLFile(getUsername());  
 				PackageManager.createZipFileArray(filePathArray);
 			} catch (IOException e) {
@@ -62,9 +61,6 @@ public class PackagePlugin extends AbstractMojo {
 		else {
 			System.out.println("Invalid Vault Java SDK source directory. The code must be in a top level 'javasdk/src/main/java' structure.");
 		}
-	    
-
-		
 	}
 	
     private String getUsername() {
