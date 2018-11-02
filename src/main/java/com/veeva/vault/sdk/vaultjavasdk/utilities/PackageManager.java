@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -156,7 +155,9 @@ public class PackageManager {
 				Path path = Paths.get(line);  
 				
 				Stream<Path> fileWalk = Files.walk(path);
-				List<Path> fileList = fileWalk.filter(pp -> (pp.toString().contains("com\\veeva\\vault\\custom\\") || pp.toString().contains("com/veeva/vault/custom/")) && !Files.isDirectory(pp)).collect(Collectors.toList());
+				List<Path> fileList = fileWalk.filter(pp -> (pp.toString().contains("com\\veeva\\vault\\custom\\") || 
+															 pp.toString().contains("com/veeva/vault/custom/"))    && 
+															 !Files.isDirectory(pp)).collect(Collectors.toList());
 				
 				if (fileList.size() == 0) {				
 					System.out.println("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
@@ -235,6 +236,8 @@ public class PackageManager {
 	    }
 	}	
 
+	
+	//Logic to set output VPK path according to the last modified .vpk file in the deployment/packages directory.
 	public static class OutputPackageFormat {
 		
 		private String filePath = "";
