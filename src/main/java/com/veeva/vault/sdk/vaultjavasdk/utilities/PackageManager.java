@@ -156,7 +156,7 @@ public class PackageManager {
 				Path path = Paths.get(line);  
 				
 				Stream<Path> fileWalk = Files.walk(path);
-				List<Path> fileList = fileWalk.filter(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") || pp.toString().contains("com/veeva/vault/custom/") && !Files.isDirectory(pp)).collect(Collectors.toList());
+				List<Path> fileList = fileWalk.filter(pp -> (pp.toString().contains("com\\veeva\\vault\\custom\\") || pp.toString().contains("com/veeva/vault/custom/")) && !Files.isDirectory(pp)).collect(Collectors.toList());
 				
 				if (fileList.size() == 0) {				
 					System.out.println("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
