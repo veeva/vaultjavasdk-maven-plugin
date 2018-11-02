@@ -29,8 +29,8 @@ public class ValidatePlugin extends AbstractMojo {
 	protected String password = "";
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
-	@Parameter( property = "source", defaultValue = "javasdk" )
-	protected Source source;
+	@Parameter( property = "source", defaultValue = "" )
+	protected Source source = new Source();
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {

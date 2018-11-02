@@ -160,7 +160,7 @@ public class PackageManager {
 															 !Files.isDirectory(pp)).collect(Collectors.toList());
 				
 				if (fileList.size() == 0) {				
-					System.out.println("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
+					System.out.println("There are no source files in \"" + path.toAbsolutePath().toString() + "\". "
 							+ "\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.");
 				}
 				else {
