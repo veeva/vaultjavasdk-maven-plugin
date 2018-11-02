@@ -156,11 +156,11 @@ public class PackageManager {
 				Path path = Paths.get(line);  
 				
 				Stream<Path> fileWalk = Files.walk(path);
-				List<Path> fileList = fileWalk.filter(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") && !Files.isDirectory(pp)).collect(Collectors.toList());
+				List<Path> fileList = fileWalk.filter(pp -> pp.toString().contains("com\\veeva\\vault\\custom\\") || pp.toString().contains("com/veeva/vault/custom/") && !Files.isDirectory(pp)).collect(Collectors.toList());
 				
 				if (fileList.size() == 0) {				
 					System.out.println("Source directory format is invalid for \"" + path.toAbsolutePath().toString() + "\". "
-							+ "\n\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.");
+							+ "\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.");
 				}
 				else {
 					fileList.forEach(p -> {
@@ -183,8 +183,14 @@ public class PackageManager {
 			        			  startSequence += 1;
 			        		  }
 			        	  }		        	  
-			        	        	  
-			        	  ZipArchiveEntry zipEntry = new ZipArchiveEntry("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
+
+			        	  ZipArchiveEntry zipEntry;
+			        	  if (System.getProperty("os.name").toLowerCase().contains("windows")){
+			        	  	  zipEntry = new ZipArchiveEntry("javasdk\\src\\main\\java\\" + p.subpath(startSequence, endSequence).toString());
+						  }
+						  else{
+							  zipEntry = new ZipArchiveEntry("javasdk/src/main/java/" + p.subpath(startSequence, endSequence).toString());
+						  }
 				          try {
 				                zs.putArchiveEntry(zipEntry);
 				                writtenBytesCount += Files.copy(p, zs);
@@ -199,17 +205,18 @@ public class PackageManager {
 		    	fileWalk.close();
 	  		}
 	  		
-	  		try {
-                zs.putArchiveEntry(zipXMLEntry);
-                Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
-	        	System.out.println("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
-                zs.closeArchiveEntry();
-            } catch (IOException e) {
-                System.err.println(e);
-            }
-	  		
 	        zs.flush();
+
 	        if (writtenBytesCount > 0) {
+				try {
+					zs.putArchiveEntry(zipXMLEntry);
+					Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
+					System.out.println("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
+					zs.closeArchiveEntry();
+				} catch (IOException e) {
+					System.err.println(e);
+				}
+				zs.flush();
 		        zs.close();
 		        System.out.println("Package file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n");
 	        }
