@@ -10,7 +10,7 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 1. Download/clone the vaultjavasdk-maven-plugin project.
 1. The plugin can either be installed by importing the Maven project into an IDE or be installing the jar file directly:
     * Import the project and select the Maven "install" goal. The JDK for the project must be set to Java 1.8+
-    * Install the target/vaultjavasdk-maven-plugin-1.0.0.jar directly:
+    * Install the target/vaultjavasdk-maven-plugin-1.0.0.jar directly. The project pom.xml is used to install the plugin:
         > mvn install:install-file -Dfile="PROJECT_DIRECTORY_PATH\target\vaultjavasdk-maven-plugin-1.0.0.jar" -DpomFile="..\pom.xml"
 
 ## Configuration
@@ -19,7 +19,7 @@ To make the Maven plugin available in a Vault Java SDK project, add the followin
 
 ```
 
-	 <properties>
+    <properties>
      		<vaultUrl>vaulturl.veevavault.com</vaultUrl>
     		<username>user@test.com</username>
     		<password>xxxxxxx</password>
@@ -75,15 +75,16 @@ The following goals are provided by the plugin.
     * If a VPK already exists, increment {mm-dd-yyyy} and/or {num} 
     * Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
 
+* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
+
 * **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [validation endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
 
-* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
+* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI. [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
 
-* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
 
 ## How to run
 
 You can either setup the goals in your IDE or run them directly through the Maven command line. The following example is for running the **deploy** goal through the command line when the parameters are not configured in the pom.xml:
 
-> mvn vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
+> mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
     
