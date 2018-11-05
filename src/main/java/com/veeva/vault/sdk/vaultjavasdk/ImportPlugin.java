@@ -32,7 +32,7 @@ public class ImportPlugin extends AbstractMojo {
 	protected String password = "";
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
-	@Parameter( property = "source", defaultValue = "" )
+	@Parameter( property = "source" )
 	protected Source source = new Source();
 	
 	@Override
@@ -59,7 +59,7 @@ public class ImportPlugin extends AbstractMojo {
 					}
 				}
 				else {
-			        System.out.println("Cannot deploy package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
+			        System.out.println("Cannot import package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
 				}			
 			}
 		} catch (MalformedURLException e) {

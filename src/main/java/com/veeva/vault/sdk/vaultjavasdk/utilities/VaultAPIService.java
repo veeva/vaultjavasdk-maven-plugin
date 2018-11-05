@@ -73,7 +73,8 @@ public class VaultAPIService {
 		    try {
 		        URL myurl = new URL(vaultUrl + apiVersion + "/auth");
 		        con = (HttpsURLConnection) myurl.openConnection();
-		
+		        con.setConnectTimeout(5000);
+		        con.setReadTimeout(5000);
 		        con.setDoOutput(true);
 		        con.setRequestMethod("POST");
 		        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -141,6 +142,8 @@ public class VaultAPIService {
 	        con = (HttpsURLConnection) myurl.openConnection();
 	        con.setDoOutput(true);
 	        con.setDoInput(true);
+	        con.setConnectTimeout(5000);
+	        con.setReadTimeout(5000);
 	        con.setRequestMethod("POST");
 	        con.setRequestProperty("Authorization", getCurrentSessionId());
 	        con.setRequestProperty("Content-Type", "");
@@ -219,6 +222,8 @@ public class VaultAPIService {
 	        con = (HttpsURLConnection) myurl.openConnection();
 	        con.setDoOutput(true);
 	        con.setDoInput(true);
+	        con.setConnectTimeout(5000);
+	        con.setReadTimeout(5000);
 	        con.setRequestMethod("PUT");
 	        con.setRequestProperty("Authorization", getCurrentSessionId());
 	        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -282,6 +287,8 @@ public class VaultAPIService {
 	        con = (HttpsURLConnection) myurl.openConnection();
 	        con.setDoOutput(true);
 	        con.setDoInput(true);
+	        con.setConnectTimeout(5000);
+	        con.setReadTimeout(5000);
 	        con.setRequestMethod("POST");
 	        con.setRequestProperty("Authorization", getCurrentSessionId());
 	        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -337,6 +344,8 @@ public class VaultAPIService {
 	        URL myurl = new URL(vaultUrl  + apiVersion + "/services/jobs/" + jobId );
 	        con = (HttpsURLConnection) myurl.openConnection();
 	        con.setRequestMethod("GET");
+	        con.setConnectTimeout(5000);
+	        con.setReadTimeout(5000);
 	        con.setRequestProperty("Authorization", getCurrentSessionId());
 	        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 	        con.setRequestProperty("Accept", "application/json");
@@ -398,6 +407,8 @@ public class VaultAPIService {
 	        URL myurl = new URL(vaultUrl + url );
 	        con = (HttpsURLConnection) myurl.openConnection();
 	        con.setRequestMethod("GET");
+	        con.setConnectTimeout(5000);
+	        con.setReadTimeout(5000);
 	        con.setRequestProperty("Authorization", getCurrentSessionId());
 	        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 	        con.setRequestProperty("Accept", "application/json");
@@ -452,6 +463,8 @@ public class VaultAPIService {
 	        URL myurl = new URL(url);
 	        con = (HttpsURLConnection) myurl.openConnection();
 	        con.setRequestMethod("GET");
+	        con.setConnectTimeout(5000);
+	        con.setReadTimeout(5000);
 	        con.setRequestProperty("Authorization", getCurrentSessionId());
 	        con.setRequestProperty("Content-Type", "");
 	        con.setRequestProperty("Accept", "application/json");

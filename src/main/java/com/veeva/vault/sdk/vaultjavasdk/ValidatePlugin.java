@@ -29,7 +29,7 @@ public class ValidatePlugin extends AbstractMojo {
 	protected String password = "";
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
-	@Parameter( property = "source", defaultValue = "" )
+	@Parameter( property = "source" )
 	protected Source source = new Source();
 	
 	@Override
