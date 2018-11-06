@@ -84,7 +84,7 @@ The following goals are provided by the plugin.
 
 ## How to run
 
-You can either setup the goals in your IDE or run them directly through the Maven command line. The following example is for running the **deploy** goal through the command line when the parameters are not configured in the pom.xml:
+You can either setup the goals in your IDE or run them directly through the Maven command line. The following example is for running the **clean**, **package**, and then **deploy** goal through the command line when the parameters are not configured in the pom.xml:
 
 > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
     

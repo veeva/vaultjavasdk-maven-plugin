@@ -21,13 +21,13 @@ import java.nio.file.StandardOpenOption;
 
 public class PackageManager {
 	
+	private static Path PROJECT_DIRECTORY = Paths.get("");
 	private static final String CURRENT_DATE = java.time.LocalDate.now().toString();
 	private static int ZIP_FILE_INCREMENT = 1;
 	private static String OUTPUT_FILE_PATH = "deployment/packages/";
 	private static String OUTPUT_FILE_NAME = "code_package";
 	private static OutputPackageFormat OUTPUT_ZIP_FILE = new OutputPackageFormat(OUTPUT_FILE_PATH);
 	private static final String OUTPUT_XML_FILE = "deployment/vaultpackage.xml";
-	private static Path PROJECT_DIRECTORY = Paths.get("");
 	private static long writtenBytesCount = 0;
 	
 
@@ -219,7 +219,7 @@ public class PackageManager {
 				}
 				zs.flush();
 		        zs.close();
-		        System.out.println("Package file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n");
+		        System.out.println("\nPackage file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n");
 	        }
 	        else {
 		        Files.deleteIfExists(outputPath);
@@ -252,7 +252,15 @@ public class PackageManager {
 			//Check for and create the necessary directories. 
 			//Then load in the last modified VPK as the current VPK to import into vault.
 			File tmp = new File(getFilePath());
-			tmp.mkdirs();
+			if (tmp.mkdirs()) {
+				
+	        	  if (System.getProperty("os.name").toLowerCase().contains("windows")){
+	        		  System.out.println("Created the '" + getProjectPath() + "\\deployment\\packages' directory.");
+				  }
+				  else{
+					  System.out.println("Created the '" + getProjectPath() + "/deployment/packages' directory.");
+				  }
+			}
 			
 			try {
 				Stream<Path> fileWalk = Files.walk(Paths.get("", getFilePath()));
