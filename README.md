@@ -1,6 +1,6 @@
 # Vault Java SDK Maven Plugin
 
-This Maven plugin assists in the packaging, validation, importation, and deployment of Vault Java SDK source code.
+This Maven plugin provides an easy to use set of commands to package, validate, import, and deploy Vault Java SDK source code through the use of defined Maven goals.
 
 ## Setup
 
@@ -76,10 +76,9 @@ The following goals are provided by the plugin.
     * If a VPK already exists, increment {mm-dd-yyyy} and/or {num} 
     * Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
 
-* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package), [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
-, and [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
+* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package), [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package), and [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
 
-* **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [validation endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
+* **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
 
 * **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
 
