@@ -52,7 +52,7 @@ public class VaultAPIService {
 	
 	public VaultAPIService(String apiVersionInput, String urlInput, String usernameInput, String passwordInput, String sessionIdInput) {
 		apiVersion = apiVersionInput;
-		vaultUrl = "https://" + urlInput;
+		vaultUrl = "https://" + urlInput.replaceFirst("https://|http://", "");
 		username = usernameInput;
 		password = passwordInput;
 		currentSessionId= sessionIdInput;

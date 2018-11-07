@@ -13,6 +13,15 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
 
+/**
+ * Goal that generates a VPK file in the "deployment/packages" directory.
+ * 
+ * 		1) VPK file name format: code_package_{mm-dd-yyyy}_{num}.vpk
+ * 		2) If the directory does not exist, it will be created.
+ * 		3) If a VPK already exists, increment {mm-dd-yyyy} and/or {num}
+ * 		4) Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
+ * 
+ */
 
 @Mojo( name = "package", requiresProject = false)
 public class PackagePlugin extends AbstractMojo {

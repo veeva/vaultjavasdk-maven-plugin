@@ -16,7 +16,7 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 
 ## Configuration
 
-To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration parameters can be set in either the pom.xml or as parameters when running the goals:
+To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration properties can be set in either the pom.xml or as parameters when running the goals:
 
 ```
 
@@ -76,11 +76,12 @@ The following goals are provided by the plugin.
     * If a VPK already exists, increment {mm-dd-yyyy} and/or {num} 
     * Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
 
-* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
+* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package), [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
+, and [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
 
 * **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [validation endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
 
-* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI. [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
+* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
 
 
 ## How to run

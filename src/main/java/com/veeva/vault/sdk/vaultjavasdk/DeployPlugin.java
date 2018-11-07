@@ -16,6 +16,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.VaultAPIService;
 
+/**
+ * Goal that validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. 
+ */
 
 @Mojo( name = "deploy", requiresProject = false)
 public class DeployPlugin extends AbstractMojo {

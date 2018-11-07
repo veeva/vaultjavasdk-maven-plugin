@@ -16,6 +16,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.VaultAPIService;
 
+/**
+ * Goal that validates and imports the last modified VPK in the "deployment/packages" directory to a vault. 
+ * This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI. Import Package Endpoint.
+ */
 
 @Mojo( name = "import", requiresProject = false)
 public class ImportPlugin extends AbstractMojo {

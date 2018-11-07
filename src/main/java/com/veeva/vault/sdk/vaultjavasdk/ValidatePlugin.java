@@ -13,6 +13,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
 import com.veeva.vault.sdk.vaultjavasdk.utilities.VaultAPIService;
 
+/**
+ * Goal that validates the last modified VPK in the "deployment/packages" directory against the validation API endpoint.
+ * 
+ */
 
 @Mojo( name = "validate", requiresProject = false)
 public class ValidatePlugin extends AbstractMojo {
