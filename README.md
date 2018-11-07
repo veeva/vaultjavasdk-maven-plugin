@@ -11,11 +11,11 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 1. The plugin can either be installed by importing the Maven project into an IDE or be installing the jar file directly:
     * Import the project and select the Maven "install" goal. The JDK for the project must be set to Java 1.8+
     * Install the target/vaultjavasdk-maven-plugin-1.0.0.jar directly. The project pom.xml is used to install the plugin:
-        > mvn install:install-file -Dfile="PROJECT_DIRECTORY_PATH\target\vaultjavasdk-maven-plugin-1.0.0.jar" -DpomFile="..\pom.xml"
+        > mvn install:install-file -Dfile="{{PROJECT_DIRECTORY_PATH}}\target\vaultjavasdk-maven-plugin-1.0.0.jar" -DpomFile="{{PROJECT_DIRECTORY_PATH}}\pom.xml"
 
 ## Configuration
 
-To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration parameters can be set either the pom.xml or as parameters when running the goals:
+To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration parameters can be set in either the pom.xml or as parameters when running the goals:
 
 ```
 
@@ -84,7 +84,7 @@ The following goals are provided by the plugin.
 
 ## How to run
 
-You can either setup the goals in your IDE or run them directly through the Maven command line. The following example is for running the **clean**, **package**, and then **deploy** goal through the command line when the parameters are not configured in the pom.xml:
-
-> mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
+You can either configure the goals in your IDE or run them directly through the Maven command line. The following example is for running the **clean**, **package**, and then **deploy** goals through the command line when the parameters are not configured in the pom.xml:
+* Navigate to your project's base directory (where the pom.xml is located):
+    > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
     

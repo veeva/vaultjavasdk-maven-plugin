@@ -171,7 +171,10 @@ public class VaultAPIService {
 					
 					ErrorHandler.logErrors(validateResponse);
 					
-					if (validateResponse.responseDetails.package_steps.size() > 0) {
+					if (!validateResponse.responseDetails.package_error.equals("")) {
+						System.out.println("Validation Error: " + validateResponse.responseDetails.package_error);
+					}
+					else if (validateResponse.responseDetails.package_steps.size() > 0) {
 						for (PackageSteps packageSteps : validateResponse.responseDetails.package_steps) {
 							if (packageSteps.validation_response.contentEquals("FAILURE")) {
 								System.out.println("Validation Message: " + packageSteps.validation_message);
