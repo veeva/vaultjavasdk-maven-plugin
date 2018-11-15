@@ -16,14 +16,34 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 
 ## Configuration
 
-To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration properties can be set in either the pom.xml or as parameters when running the goals:
+To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration properties can be set in either the pom.xml or as parameters when running the goals.
+
+Configuration Parameters:    
+
+```
+<vaultUrl> - a vault’s DNS host name (e.g. vaulturl.veevavault.com with no HTTPS://)
+<userName> - the vault user name to use for authentication required for using the import, deploy, and validate goals
+<password> - the password for user specified above. 
+
+      ** As a best practice, it is recommended that the password is input through the command line or via an IDE build parameter. 
+      ** In general, you should avoid saving the password in the pom.xml file when possible. 
+	     
+<sessionId> - optional, an authenticated live user session id used instead of providing userName/password credentials
+<apiVerision> - optional, defaults to v18.3
+<source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters.
+	<packages> - comma separated list of package names from the project
+	<classes> - comma separated list of fully qualified java file names
+```
+
+The pom.xml configuration:
+
 
 ```
 
     <properties>
      		<vaultUrl>vaulturl.veevavault.com</vaultUrl>
     		<username>user@test.com</username>
-    		<password>xxxxxxx</password>
+    		<password></password>
     		<sessionId></sessionId>
     		<source.packages></source.packages>
     		<source.classes></source.classes>
@@ -51,19 +71,6 @@ To make the Maven plugin available in a Vault Java SDK project, add the followin
     </build>    
 ```
 
-Configuration Parameters:    
-
-```
-<vaultUrl> - a vault’s DNS host name
-<userName> - the Vault user name to use for authentication required for using the import, deploy, and validate goals
-<password> - the password for user specified above. 
-<sessionId> - optional, an authenticated live user session id used instead of providing userName/password credentials
-<apiVerision> - optional, defaults to v18.3
-<source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters; the parameter can be named anything.
-	<packages> - comma separated list of package names from the project
-	<classes> - comma separated list of fully qualified java file names
-```
-
 ## Maven Goals 
 
 The following goals are provided by the plugin.
@@ -80,7 +87,7 @@ The following goals are provided by the plugin.
 
 * **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
 
-* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
+* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. **This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
 
 
 ## How to run
