@@ -92,9 +92,9 @@ The following goals are provided by the plugin.
 
 ### Notes
 
-1. The **validate**, **import**, and **deploy** goals will pick up the last modified ".vpk" file in the "deployment/packages" folder. This means that you can craft your own custom VPK files provides they are the last modified ".vpk" file in the "deployment/packages" folder.
+1. The **validate**, **import**, and **deploy** goals will pick up the last modified ".vpk" file in the "deployment/packages" folder. This means that you can craft your own custom VPK files provided they are the last modified ".vpk" file in the "deployment/packages" folder.
 2. The **package** goal won't replace the "vaultpackage.xml" file in the "deployment" folder. You can modify values in this file to meet your needs.
-3. The **package** goal is run separated from the import, deploy, and validate goals. This means that any code changes will require a "vaultjavasdk:package" before running an import, deploy, or validate if you want to pick up the latest code.
+3. The **package** goal is run separately from the import, deploy, and validate goals. This means that any code changes will require a "vaultjavasdk:package" before running an import, deploy, or validate if you want to pick up the latest code.
 
 
 ## How to run
