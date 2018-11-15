@@ -90,6 +90,13 @@ The following goals are provided by the plugin.
 * **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. **This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
 
 
+### Notes
+
+1. The **validate**, **import**, and **deploy** goals will pick up the last modified ".vpk" file in the "deployment/packages" folder. This means that you can craft your own custom VPK files provides they are the last modified ".vpk" file in the "deployment/packages" folder.
+2. The **package** goal won't replace the "vaultpackage.xml" file in the "deployment" folder. You can modify values in this file to meet your needs.
+3. The **package** goal is run separated from the import, deploy, and validate goals. This means that any code changes will require a "vaultjavasdk:package" before running an import, deploy, or validate if you want to pick up the latest code.
+
+
 ## How to run
 
 You can either configure the goals in your IDE or run them directly through the Maven command line. The following example is for running the **clean**, **package**, and then **deploy** goals through the command line when the parameters are not configured in the pom.xml:
