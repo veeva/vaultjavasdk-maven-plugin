@@ -83,11 +83,11 @@ The following goals are provided by the plugin.
     * If a VPK already exists, increment {mm-dd-yyyy} and/or {num} 
     * Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
 
-* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package), [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package), and [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#deploy-package).
+* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. This uses the [Validation Endpoint](https://developer.veevavault.com/api/18.3/#Validate_Code), [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#Import_Package_Config), and [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#Deploy_Package_Config).
 
-* **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package).
+* **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [Validation Endpoint](https://developer.veevavault.com/api/18.3/#Validate_Code).
 
-* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. **This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validation Endpoint](https://internal-developer.veevavault.com/api/18.3/#validate-package) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#import-package).
+* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. **This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validation Endpoint](https://developer.veevavault.com/api/18.3/#Validate_Code) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#Import_Package_Config).
 
 
 ### Notes
