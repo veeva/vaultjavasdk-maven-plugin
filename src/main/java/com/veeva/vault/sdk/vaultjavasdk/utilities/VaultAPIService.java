@@ -38,7 +38,6 @@ public class VaultAPIService {
 	private String vaultUrl = null;
 	private String username = null;
 	private String password = null;
-	private String packageId = null;
 	
 	private static HttpsURLConnection con = null;
 	private static Type ErrorType = new TypeToken<ErrorType>(){}.getType();
@@ -253,7 +252,6 @@ public class VaultAPIService {
 						importResponse.getField("responseStatus").toString().toUpperCase().contains("EXCEPTION")){
 					
 					ErrorHandler.logErrors(importResponse);
-					packageId = null;
 					return null;
 				}
 				else if (importResponse instanceof ImportType){
@@ -263,8 +261,7 @@ public class VaultAPIService {
 			         System.out.println("Package Name: " + (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("name"));
 			         System.out.println("Package Id: " + ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id"));
 			        
-			         packageId = (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id");
-			         return packageId;
+			         return (String) ((ImportType.VaultPackage) importResponse.getField("vaultPackage")).getField("id");
 				}
 				else {
 					 System.out.println("Invalid responseType object.");
@@ -335,7 +332,7 @@ public class VaultAPIService {
 	    	}
 	    }	
 	    
-		return "Complete";
+		return null;
 	}
 
 	
@@ -379,11 +376,10 @@ public class VaultAPIService {
 			        	
 			        }
 			        else if (jobStatusResponse.data.status.contains("RUNNING")){
-//			        	System.out.print("...");
 			        	return jobStatusResponse.data.status;
 			        }
 			        else {
-			        	System.out.println("Successfully deployed package: " + packageId);
+//			        	System.out.println("Successfully deployed package: " + packageId);
 			        	return jobStatusResponse.data.links.get(1).href;
 			        }
 				}

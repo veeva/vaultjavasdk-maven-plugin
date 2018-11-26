@@ -30,6 +30,8 @@ Configuration Parameters:
 	     
 <sessionId> - optional, an authenticated live user session id used instead of providing userName/password credentials
 <apiVerision> - optional, defaults to v18.3
+<package> - optional, define a custom VPK to deploy. The VPK must exist in '{{PROJECT_DIRECTORY_PATH}}/deployment/packages'
+<packageId> - optional, deploy a specific imported package ID. To be used in conjunction with the vaultjavasdk:import goal.
 <source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters.
 	<packages> - comma separated list of package names from the project
 	<classes> - comma separated list of fully qualified java file names
@@ -103,6 +105,28 @@ You can either configure the goals in your IDE or run them directly through the 
 * Navigate to your project's base directory (where the pom.xml is located) and execute the following:
    
     > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
+    
+### Other Goal Examples
+
+* Custom VPK package
+
+    > mvn vaultjavasdk:deploy -Dpackage=custom_package.vpk -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com  
+    
+* Import and then Deploy
+
+    > mvn vaultjavasdk:import -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com  
+
+    Import response:
+        
+```    
+Import Package Request: https://vaulturl.veevavault.com/api/v18.3/services/package   
+Package: {{PROJECT_DIRECTORY_PATH}}\deployment\packages\code_package_xxxx-xx-xx.vpk
+Successfully imported [{{PROJECT_DIRECTORY_PATH}}\deployment\packages\code_package_xxxx-xx-xx.vpk]
+Package Name: PKG-project-name
+Package Id: 0PI000000000XXX
+```
+
+    > mvn vaultjavasdk:deploy -DpackageId=0PI000000000XXX -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com 
     
     
 ## License

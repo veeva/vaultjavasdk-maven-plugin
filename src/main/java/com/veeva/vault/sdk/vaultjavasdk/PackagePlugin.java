@@ -36,6 +36,10 @@ public class PackagePlugin extends AbstractMojo {
 	protected String password = "";
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
+	@Parameter( property = "package", defaultValue = "" )
+	protected String packageName = "";
+	@Parameter( property = "packageId", defaultValue = "" )
+	protected String packageId = "";
 	@Parameter( property = "source" )
 	protected Source source = new Source();
 	
@@ -61,7 +65,6 @@ public class PackagePlugin extends AbstractMojo {
 		    	PackageManager.createXMLFile(getUsername());  
 				PackageManager.createZipFileArray(filePathArray);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				System.out.println("Packaging error:" + e.toString());
 			}
 		}

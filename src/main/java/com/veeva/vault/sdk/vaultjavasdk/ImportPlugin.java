@@ -36,6 +36,10 @@ public class ImportPlugin extends AbstractMojo {
 	protected String password = "";
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
+	@Parameter( property = "package", defaultValue = "" )
+	protected String packageName = "";
+	@Parameter( property = "packageId", defaultValue = "" )
+	protected String packageId = "";
 	@Parameter( property = "source" )
 	protected Source source = new Source();
 	
@@ -54,6 +58,10 @@ public class ImportPlugin extends AbstractMojo {
 				System.out.println("");
 				String status = null;
 				
+				if (!packageName.equals("")) {
+					PackageManager.setPackagePath(packageName);
+				}
+
 				if (PackageManager.getPackagePath() != null) {
 					status = vaultClient.validatePackage(PackageManager.getPackagePath());
 					

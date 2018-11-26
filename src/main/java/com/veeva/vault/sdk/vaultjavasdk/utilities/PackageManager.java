@@ -72,9 +72,24 @@ public class PackageManager {
 		
 	}
 	
+	public static void setPackagePath(String packageName) {
+
+		if (packageName.endsWith(".vpk")) {
+			PackageManager.getOutputPackageObject().setFileName(packageName.substring(0, packageName.length()-4));
+			PackageManager.getOutputPackageObject().setIncrement(0);
+			PackageManager.getOutputPackageObject().setLocalDate("");
+		}
+		else {
+			System.out.println("Error:  The defined package must be a '.vpk'.");
+			PackageManager.getOutputPackageObject().setFileName("");
+			PackageManager.getOutputPackageObject().setIncrement(0);
+			PackageManager.getOutputPackageObject().setLocalDate("");
+		}
+
+	}
+	
 	public static boolean cleanPackageDirectory() {
 		
-		boolean deleted = false;
 		try {
 			Stream<Path> fileWalk = Files.walk(Paths.get("", "deployment"));
 			List<Path> fileList = fileWalk.filter(pp -> !Files.isDirectory(pp)).collect(Collectors.toList());
@@ -116,7 +131,6 @@ public class PackageManager {
 		tmp.getParentFile().mkdirs();
 		
 		try {
-//			Files.deleteIfExists(Paths.get("", OUTPUT_XML_FILE));
 			if (!Files.exists(Paths.get("", OUTPUT_XML_FILE))) {
 				Path file = Files.createFile(Paths.get("", OUTPUT_XML_FILE));
 				Files.write(file, lines, Charset.forName("UTF-8"));
@@ -235,6 +249,11 @@ public class PackageManager {
 			System.out.println("No files were packaged. VPK was not created.\n\n");  
 	    }
 	}	
+	
+	public static OutputPackageFormat getOutputPackageObject() {
+		return OUTPUT_ZIP_FILE;
+		
+	}
 
 	
 	//Logic to set output VPK path according to the last modified .vpk file in the deployment/packages directory.

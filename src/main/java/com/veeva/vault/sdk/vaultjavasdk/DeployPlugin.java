@@ -35,6 +35,10 @@ public class DeployPlugin extends AbstractMojo {
 	protected String password = "";
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
+	@Parameter( property = "package", defaultValue = "" )
+	protected String packageName = "";
+	@Parameter( property = "packageId", defaultValue = "" )
+	protected String packageId = "";
 	@Parameter( property = "source" )
 	protected Source source = new Source();
 	
@@ -42,7 +46,6 @@ public class DeployPlugin extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		apiVersion = "/api/" + apiVersion;
 		VaultAPIService vaultClient = new VaultAPIService(apiVersion, vaultUrl, username, password, sessionId);
-		
 		
 		try {
 			//Initializes an Authentication API connection.
@@ -53,21 +56,30 @@ public class DeployPlugin extends AbstractMojo {
 				String status = null;
 				System.out.println("");
 				
-				if (PackageManager.getPackagePath() != null) {
-					status = vaultClient.validatePackage(PackageManager.getPackagePath());
-					System.out.println("");
-					
-					if (status != null) {
-						status = vaultClient.importPackage(PackageManager.getPackagePath());
+				if (!packageName.equals("")) {
+					PackageManager.setPackagePath(packageName);
+				}
+
+				if (packageId.equals("")) {
+					if (PackageManager.getPackagePath() != null) {
+						status = vaultClient.validatePackage(PackageManager.getPackagePath());
+						System.out.println("");
+						
+						if (status != null) {
+							packageId = vaultClient.importPackage(PackageManager.getPackagePath());
+						}
+					}
+					else {
+				        System.out.println("Cannot deploy package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
 					}
 				}
 				else {
-			        System.out.println("Cannot deploy package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
+					status = packageId;
 				}
 		
-				if (status != null) {
+				if (packageId != null) {
 					System.out.println("");
-					String job_id = vaultClient.deployPackage(status);
+					String job_id = vaultClient.deployPackage(packageId);
 					if (job_id != null) {
 						System.out.println("Deployment in progress...");
 						String jobStatus = "RUNNING";
@@ -77,6 +89,7 @@ public class DeployPlugin extends AbstractMojo {
 						}
 						
 						if (!jobStatus.contentEquals("RUNNING") && !jobStatus.contentEquals("FAILURE") && !jobStatus.contentEquals("EXCEPTION")) {
+				        	System.out.println("Successfully deployed package: " + packageId);
 							System.out.println("");
 							vaultClient.deployResults(jobStatus);
 						}
@@ -108,9 +121,4 @@ public class DeployPlugin extends AbstractMojo {
 		}
 		
 	}
-	
-    private String getUsername() {
-    	return username;
-    }
-
 }
