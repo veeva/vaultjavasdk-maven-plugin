@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.apache.maven.plugins.annotations.Parameter;
 
 public class Source {
-	@Parameter
+	@Parameter( property = "source.packages", defaultValue = "" )
 	public ArrayList<String> packages = new ArrayList<String>();
 	
 	@Parameter( property = "source.classes", defaultValue = "" )
@@ -29,10 +29,6 @@ public class Source {
 		this.classes = classes;
 	}
 
-	public void setPackages(ArrayList<String> packages) {
-		this.packages = packages;
-	}
-
 	public ArrayList<String> getPackages() {
 		ArrayList<String> packagesOutput = new ArrayList<String>();
 		for (String x : packages) {
@@ -41,6 +37,10 @@ public class Source {
 			}
 		}
 		return packagesOutput;
+	}
+	
+	public void setPackages(ArrayList<String> packages) {
+		this.packages = packages;
 	}
 	
 	public ArrayList<String> getSource() {
