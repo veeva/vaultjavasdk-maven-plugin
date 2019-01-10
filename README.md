@@ -10,7 +10,7 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 1. Download/clone the vaultjavasdk-maven-plugin project.
 1. The plugin can either be installed by importing the Maven project into an IDE or be installing the jar file directly:
     * Import the project and select the Maven "install" goal. The JDK for the project must be set to Java 1.8+
-    * Install the target/vaultjavasdk-maven-plugin-1.0.0.jar directly. The project pom.xml is used to install the plugin:
+    * Install the target/vaultjavasdk-maven-plugin-1.0.1.jar directly. The project pom.xml is used to install the plugin:
        
         > mvn install:install-file -Dfile="{{PROJECT_DIRECTORY_PATH}}\target\vaultjavasdk-maven-plugin-1.0.0.jar" -DpomFile="{{PROJECT_DIRECTORY_PATH}}\pom.xml"
 
