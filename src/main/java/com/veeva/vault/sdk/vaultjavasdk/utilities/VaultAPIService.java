@@ -375,7 +375,7 @@ public class VaultAPIService {
 			        	return jobStatusResponse.data.links.get(1).href;
 			        	
 			        }
-			        else if (jobStatusResponse.data.status.contains("RUNNING")){
+			        else if (jobStatusResponse.data.status.contains("RUNNING") || jobStatusResponse.data.status.contains("QUEU")){
 			        	return jobStatusResponse.data.status;
 			        }
 			        else {
@@ -528,7 +528,6 @@ public class VaultAPIService {
                 content.append(System.lineSeparator());
             }
         }
-//        System.out.println(content.toString());
         return new Gson().fromJson(content.toString(), type);
 	}
 	

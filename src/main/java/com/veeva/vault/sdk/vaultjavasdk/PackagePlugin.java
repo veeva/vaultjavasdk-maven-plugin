@@ -30,7 +30,7 @@ public class PackagePlugin extends AbstractMojo {
 	protected  String apiVersion = "";
 	@Parameter( property = "vaulturl", defaultValue = "" )
 	protected String vaultUrl = "";
-	@Parameter( property = "username", defaultValue = "" )
+	@Parameter( property = "username", defaultValue = "Vault Java SDK Maven Plugin" )
 	protected String username = "";
 	@Parameter( property = "password", defaultValue = "" )
 	protected String password = "";
@@ -74,7 +74,14 @@ public class PackagePlugin extends AbstractMojo {
 	}
 	
     private String getUsername() {
-    	return username;
+    	
+    	if (username.equals("")) {
+    		return "Vault Java SDK Maven Plugin";
+    	}
+    	else {
+        	return username;
+    	}
+    	
     }
 
 }
