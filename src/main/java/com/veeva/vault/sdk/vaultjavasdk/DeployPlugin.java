@@ -36,7 +36,7 @@ public class DeployPlugin extends AbstractMojo {
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
 	@Parameter( property = "package", defaultValue = "" )
-	protected String packageName = "";
+	protected String packageFilename = "";
 	@Parameter( property = "packageId", defaultValue = "" )
 	protected String packageId = "";
 	@Parameter( property = "source" )
@@ -56,8 +56,8 @@ public class DeployPlugin extends AbstractMojo {
 				String status = null;
 				System.out.println("");
 				
-				if (!packageName.equals("")) {
-					PackageManager.setPackagePath(packageName);
+				if (!packageFilename.equals("")) {
+					PackageManager.setPackagePath(packageFilename);
 				}
 
 				if (packageId.equals("")) {

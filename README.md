@@ -10,9 +10,9 @@ The Maven plugin must be installed locally to be used in a Vault Java SDK projec
 1. Download/clone the vaultjavasdk-maven-plugin project.
 1. The plugin can either be installed by importing the Maven project into an IDE or be installing the jar file directly:
     * Import the project and select the Maven "install" goal. The JDK for the project must be set to Java 1.8+
-    * Install the target/vaultjavasdk-maven-plugin-1.0.2.jar directly. The project pom.xml is used to install the plugin:
+    * Install the target/vaultjavasdk-maven-plugin-1.0.3.jar directly. The project pom.xml is used to install the plugin:
        
-        > mvn install:install-file -Dfile="{{PROJECT_DIRECTORY_PATH}}\target\vaultjavasdk-maven-plugin-1.0.2.jar" -DpomFile="{{PROJECT_DIRECTORY_PATH}}\pom.xml"
+        > mvn install:install-file -Dfile="{{PROJECT_DIRECTORY_PATH}}\target\vaultjavasdk-maven-plugin-1.0.3.jar" -DpomFile="{{PROJECT_DIRECTORY_PATH}}\pom.xml"
 
 ## Configuration
 
@@ -35,6 +35,10 @@ Configuration Parameters:
 <source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters.
 	<packages> - comma separated list of package names from the project
 	<classes> - comma separated list of fully qualified java file names
+<packageName> - optional, the name of the package that will be set in the vaultpackage.xml
+<summary> - optional, the summary that will be set in the vaultpackage.xml
+<description> - optional, the description that will be set in the vaultpackage.xml
+<deploymentOption> - optional, defaults to incremental. Use extreme caution setting this to replace_all
 ```
 
 The pom.xml configuration:
@@ -49,6 +53,11 @@ The pom.xml configuration:
     		<sessionId></sessionId>
     		<source.packages></source.packages>
     		<source.classes></source.classes>
+            
+            <packageName></packageName>
+    		<summary></summary>
+    		<description></description>
+    		<deploymentOption></deploymentOption>
     </properties>
     
     <build>    
@@ -66,6 +75,10 @@ The pom.xml configuration:
 	        			<classes>${source.classes}</classes>
 	        		</source>
 	        		<apiVersion>v18.3</apiVersion>
+                    <packageName></packageName>
+                    <summary></summary>
+                    <description></description>
+                    <deploymentOption></deploymentOption>                    
 	        	</configuration>
         	</plugin>
         </plugins>
@@ -100,11 +113,13 @@ The following goals are provided by the plugin.
 
 ## How to run
 
-You can either configure the goals in your IDE or run them directly through the Maven command line. The following example is for running the **clean**, **package**, and then **deploy** goals through the command line when the parameters are not configured in the pom.xml:
+You can either configure the goals in your IDE or run them directly through the Maven command line. 
+
+The following example is for running the **clean**, **package**, and then **deploy** goals through the command line when the parameters are not configured in the pom.xml:
 * Navigate to your project's base directory (where the pom.xml is located) and execute the following:
    
     > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
-    
+
 ### Other Goal Examples
 
 * Custom VPK package

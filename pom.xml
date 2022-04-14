@@ -4,7 +4,7 @@
 
   <groupId>com.veeva.vault.sdk</groupId>
   <artifactId>vaultjavasdk-maven-plugin</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>maven-plugin</packaging>
 
   <name>Vault Java SDK Maven Plugin</name>

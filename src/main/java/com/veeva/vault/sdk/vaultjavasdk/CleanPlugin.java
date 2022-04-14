@@ -29,7 +29,7 @@ public class CleanPlugin extends AbstractMojo {
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
 	@Parameter( property = "package", defaultValue = "" )
-	protected String packageName = "";
+	protected String packageFilename = "";
 	@Parameter( property = "packageId", defaultValue = "" )
 	protected String packageId = "";
 	@Parameter( property = "source" )
