@@ -105,7 +105,7 @@
           <version>${project.version}</version>
           <packaging>jar</packaging>
           <generatePom>true</generatePom>
-          <url>file://${project.build.directory}/remote</url>
+          <url>file://${project.basedir}/publicrepo/maven</url>
           <file>${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
         </configuration>
         <executions>
