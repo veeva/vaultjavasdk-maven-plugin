@@ -49,10 +49,18 @@ public class PackageManager {
 		}
 		
 		if (!Files.isDirectory(path)) {
-			File dir = new File(path.getParent().toAbsolutePath().toString());
-			for(String fileName : dir.list()) {
-				if (fileName.toLowerCase().contains(path.getFileName().toString().toLowerCase())) {
-					path = Paths.get(path.getParent().toString() + "/" + fileName);
+			Path javaPath = Paths.get("", path + ".java");
+			if (Files.exists(javaPath)) {
+				// specified a java file was specified			
+				path = javaPath;
+			} else {
+				// use original search logic 
+				// this logic is suspect, because it  will match  folderA/folderB/source  to  folderA/folderB/anothersource.java (if it exists) instead of folderA/folderB/source.java (even when source.java exsits)
+				File dir = new File(path.getParent().toAbsolutePath().toString());
+				for(String fileName : dir.list()) {
+					if (fileName.toLowerCase().contains(path.getFileName().toString().toLowerCase())) {
+						path = Paths.get(path.getParent().toString() + "/" + fileName);
+					}
 				}
 			}
 		}
