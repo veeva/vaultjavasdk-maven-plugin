@@ -37,11 +37,22 @@ public class PackagePlugin extends AbstractMojo {
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
 	@Parameter( property = "package", defaultValue = "" )
-	protected String packageName = "";
+	protected String packageFilename = "";
 	@Parameter( property = "packageId", defaultValue = "" )
 	protected String packageId = "";
 	@Parameter( property = "source" )
 	protected Source source = new Source();
+
+
+	@Parameter( property = "packageName", defaultValue = "" )
+	protected String packageName = "";
+	@Parameter( property = "summary", defaultValue = "" )
+	protected String summary = "";
+	@Parameter( property = "description", defaultValue = "" )
+	protected String description = "";
+	@Parameter( property = "deploymentOption", defaultValue = "incremental" )
+	protected String deploymentOption = "";
+
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -62,7 +73,7 @@ public class PackagePlugin extends AbstractMojo {
  
 		    try {
 		    	System.out.println("");
-		    	PackageManager.createXMLFile(getUsername());  
+		    	PackageManager.createXMLFile(getUsername(), packageName, summary, description, deploymentOption);  
 				PackageManager.createZipFileArray(filePathArray);
 			} catch (IOException e) {
 				System.out.println("Packaging error:" + e.toString());

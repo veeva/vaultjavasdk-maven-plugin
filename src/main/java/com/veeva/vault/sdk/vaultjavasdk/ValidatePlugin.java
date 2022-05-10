@@ -34,7 +34,7 @@ public class ValidatePlugin extends AbstractMojo {
 	@Parameter( property = "sessionId", defaultValue = "" )
 	protected String sessionId = "";
 	@Parameter( property = "package", defaultValue = "" )
-	protected String packageName = "";
+	protected String packageFilename = "";
 	@Parameter( property = "packageId", defaultValue = "" )
 	protected String packageId = "";
 	@Parameter( property = "source" )
@@ -55,8 +55,8 @@ public class ValidatePlugin extends AbstractMojo {
 				System.out.println("");
 				String status = null;
 				
-				if (!packageName.equals("")) {
-					PackageManager.setPackagePath(packageName);
+				if (!packageFilename.equals("")) {
+					PackageManager.setPackagePath(packageFilename);
 				}
 				
 				if (PackageManager.getPackagePath() != null) {

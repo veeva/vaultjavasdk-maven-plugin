@@ -49,10 +49,18 @@ public class PackageManager {
 		}
 		
 		if (!Files.isDirectory(path)) {
-			File dir = new File(path.getParent().toAbsolutePath().toString());
-			for(String fileName : dir.list()) {
-				if (fileName.toLowerCase().contains(path.getFileName().toString().toLowerCase())) {
-					path = Paths.get(path.getParent().toString() + "/" + fileName);
+			Path javaPath = Paths.get("", path + ".java");
+			if (Files.exists(javaPath)) {
+				// specified a java file was specified			
+				path = javaPath;
+			} else {
+				// use original search logic 
+				// this logic is suspect, because it  will match  folderA/folderB/source  to  folderA/folderB/anothersource.java (if it exists) instead of folderA/folderB/source.java (even when source.java exsits)
+				File dir = new File(path.getParent().toAbsolutePath().toString());
+				for(String fileName : dir.list()) {
+					if (fileName.toLowerCase().contains(path.getFileName().toString().toLowerCase())) {
+						path = Paths.get(path.getParent().toString() + "/" + fileName);
+					}
 				}
 			}
 		}
@@ -72,10 +80,10 @@ public class PackageManager {
 		
 	}
 	
-	public static void setPackagePath(String packageName) {
+	public static void setPackagePath(String packageFilename) {
 
-		if (packageName.endsWith(".vpk")) {
-			PackageManager.getOutputPackageObject().setFileName(packageName.substring(0, packageName.length()-4));
+		if (packageFilename.endsWith(".vpk")) {
+			PackageManager.getOutputPackageObject().setFileName(packageFilename.substring(0, packageFilename.length()-4));
 			PackageManager.getOutputPackageObject().setIncrement(0);
 			PackageManager.getOutputPackageObject().setLocalDate("");
 		}
@@ -110,19 +118,26 @@ public class PackageManager {
 		return true;
 	}
 	
+	// deploymentOption = incremental or replace_all
 	//Create the required "vaultpackage.xml" file for the VPK. The specifies a default deployment option of "incremental".
-	public static String createXMLFile(String username) {
+	public static String createXMLFile(String username, String packageName, String summary, String description, String deploymentOption) {
 		
+		if (packageName == null || packageName.length() == 0) packageName = "PKG-" + PROJECT_DIRECTORY.toAbsolutePath().getFileName().toString() + "-code";
+		if (summary == null || summary.length() == 0) summary = "The " + PROJECT_DIRECTORY.toAbsolutePath().getFileName().toString() + " project code.";
+		if (description == null || description.length() == 0) description = "This VPK contains the Vault Java SDK code for the '" + PROJECT_DIRECTORY.toAbsolutePath().getFileName().toString() + "' project.";
+		if (deploymentOption == null || deploymentOption.length() == 0) deploymentOption = "incremental";
+
+
 		List<String> lines = Arrays.asList( "<vaultpackage xmlns=\"https://veevavault.com/\">",
-											"<name>PKG-" + PROJECT_DIRECTORY.toAbsolutePath().getFileName().toString() + "-code</name>",
+											"<name>" + packageName + "</name>",
 											"<source>",
 											"<vault></vault>",
-											"<author>"+ username + "</author>",
+											"<author>" + username + "</author>",
 											"</source>",
-											"<summary>The " + PROJECT_DIRECTORY.toAbsolutePath().getFileName().toString() + " project code.</summary>",
-											"<description>This VPK contains the Vault Java SDK code for the '" + PROJECT_DIRECTORY.toAbsolutePath().getFileName().toString() + "' project.</description>",
+											"<summary>" + summary + "</summary>",
+											"<description>" + description + "</description>",
 											"<javasdk>\r\n" + 
-											"	<deployment_option>incremental</deployment_option>\r\n" + 
+											"	<deployment_option>" + deploymentOption + "</deployment_option>\r\n" + 
 											"</javasdk>",
 											"</vaultpackage>");
 		
