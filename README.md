@@ -2,8 +2,17 @@
 
 This Maven plugin provides an easy to use set of commands to package, validate, import, and deploy Vault Java SDK source code through the use of defined Maven goals.
 
-## Prerequisites
-1. [Download](https://maven.apache.org/download.cgi) and [Install](https://maven.apache.org/install.html) Maven.
+## Setup
+
+The Maven plugin must be installed locally to be used in a Vault Java SDK project. 
+
+1. Install [Maven](https://maven.apache.org/download.cgi) on your computer. 
+1. Download/clone the vaultjavasdk-maven-plugin project.
+1. The plugin can either be installed by importing the Maven project into an IDE or be installing the jar file directly:
+    * Import the project and select the Maven "install" goal. The JDK for the project must be set to Java 1.8+
+    * Install the target/vaultjavasdk-maven-plugin-1.0.2.jar directly. The project pom.xml is used to install the plugin:
+       
+        > mvn install:install-file -Dfile="{{PROJECT_DIRECTORY_PATH}}\target\vaultjavasdk-maven-plugin-1.0.2.jar" -DpomFile="{{PROJECT_DIRECTORY_PATH}}\pom.xml"
 
 ## Configuration
 
@@ -12,58 +21,52 @@ To make the Maven plugin available in a Vault Java SDK project, add the followin
 Configuration Parameters:    
 
 ```
-<vaultDNS> - a vault’s DNS host name (e.g. vaulturl.veevavault.com with no HTTPS://)
-<username> - the vault user name to use for authentication required for using the import, deploy, and validate goals
-<password> - the password for user specified in <username>. As a best practice, input the password through the command line or via an IDE build parameter. Avoid saving the password in the pom.xml file 
+<vaultUrl> - a vault’s DNS host name (e.g. vaulturl.veevavault.com with no HTTPS://)
+<userName> - the vault user name to use for authentication required for using the import, deploy, and validate goals
+<password> - the password for user specified above. 
+
+      ** As a best practice, it is recommended that the password is input through the command line or via an IDE build parameter. 
+      ** In general, you should avoid saving the password in the pom.xml file when possible. 
+	     
 <sessionId> - optional, an authenticated live user session id used instead of providing userName/password credentials
+<apiVerision> - optional, defaults to v18.3
 <package> - optional, define a custom VPK to deploy. The VPK must exist in '{{PROJECT_DIRECTORY_PATH}}/deployment/packages'
 <packageId> - optional, deploy a specific imported package ID. To be used in conjunction with the vaultjavasdk:import goal. The ID can also be retrieved from the vault UI.
 <source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters.
 	<packages> - comma separated list of package names from the project
 	<classes> - comma separated list of fully qualified java file names
-	
-* In general, you should avoid saving the password in the pom.xml file when possible. 
 ```
 
 The pom.xml configuration:
 
 
 ```
-<pluginRepositories>
-        <pluginRepository>
-            <id>vaultjavasdk-maven-plugin</id>
-            <url>https://veeva.github.io/vaultjavasdk-maven-plugin/maven</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-    ...
+
+    <properties>
+     		<vaultUrl>vaulturl.veevavault.com</vaultUrl>
+    		<username>user@test.com</username>
+    		<password></password>
+    		<sessionId></sessionId>
+    		<source.packages></source.packages>
+    		<source.classes></source.classes>
+    </properties>
+    
     <build>    
         <plugins>
         	<plugin>
         		<groupId>com.veeva.vault.sdk</groupId>
 	        	<artifactId>vaultjavasdk-maven-plugin</artifactId>
-<<<<<<< HEAD
-<<<<<<< HEAD
-	        	<version>2.0.0</version>
-=======
 	        	<version>1.0.1</version>
->>>>>>> parent of 524d7f4 (Update README.md)
-=======
-	        	<version>1.0.1</version>
->>>>>>> parent of 524d7f4 (Update README.md)
 	        	<configuration>
-	        		<vaultDNS>vaulturl.veevavault.com</vaultDNS>
-	        		<username>user@test.com</username>
-	        		<password></password>
-	        		<sessionId></sessionId>
-	        		<packageId></packageId>
+	        		<vaultUrl>${vaultUrl}</vaultUrl>
+	        		<username>${username}</username>
+	        		<password>${password}</password>
+	        		<sessionId>${sessionId}</sessionId>
 	        		<source>
-	        			<packages></packages>
-	        			<classes></classes>
+	        			<packages>${source.packages}</packages>
+	        			<classes>${source.classes}</classes>
 	        		</source>
+	        		<apiVersion>v18.3</apiVersion>
 	        	</configuration>
         	</plugin>
         </plugins>
@@ -101,26 +104,36 @@ The following goals are provided by the plugin.
 You can either configure the goals in your IDE or run them directly through the Maven command line. The following example is for running the **clean**, **package**, and then **deploy** goals through the command line when the parameters are not configured in the pom.xml:
 * Navigate to your project's base directory (where the pom.xml is located) and execute the following:
    
-    > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultDNS=testurl.veevavault.com
+    > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com
     
 ### Other Goal Examples
 
 * Custom VPK package
 
-    > mvn vaultjavasdk:deploy -Dpackage=custom_package.vpk -Dusername=test@user.com -Dpassword=test0000 -DvaultDNS=testurl.veevavault.com  
+    > mvn vaultjavasdk:deploy -Dpackage=custom_package.vpk -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com  
     
 * Import and then Deploy
 
-    > mvn vaultjavasdk:import -Dusername=test@user.com -Dpassword=test0000 -DvaultDNS=testurl.veevavault.com  
+    > mvn vaultjavasdk:import -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com  
+    
+    Import response - use the "Package Id" for the deployment:
+        
+    ```    
+    Import Package Request: https://testurl.veevavault.com/api/v18.3/services/package   
+    Package: {{PROJECT_DIRECTORY_PATH}}\deployment\packages\code_package_xxxx-xx-xx.vpk
+    Successfully imported [{{PROJECT_DIRECTORY_PATH}}\deployment\packages\code_package_xxxx-xx-xx.vpk]
+    Package Name: PKG-project-name
+    Package Id: 0PI000000000XXX
+    ```
 
-    > mvn vaultjavasdk:deploy -DpackageId=0PI000000000XXX -Dusername=test@user.com -Dpassword=test0000 -DvaultDNS=testurl.veevavault.com 
+    > mvn vaultjavasdk:deploy -DpackageId=0PI000000000XXX -Dusername=test@user.com -Dpassword=test0000 -DvaultUrl=testurl.veevavault.com 
     
     
 ## License
 
 This code serves as an example and is not meant for production use.
 
-Copyright 2022 Veeva Systems Inc.
+Copyright 2018 Veeva Systems Inc.
  
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
