@@ -45,7 +45,11 @@ The pom.xml configuration:
         	<plugin>
         		<groupId>com.veeva.vault.sdk</groupId>
 	        	<artifactId>vaultjavasdk-maven-plugin</artifactId>
+<<<<<<< HEAD
 	        	<version>2.0.0</version>
+=======
+	        	<version>1.0.1</version>
+>>>>>>> parent of 524d7f4 (Update README.md)
 	        	<configuration>
 	        		<vaultDNS>vaulturl.veevavault.com</vaultDNS>
 	        		<username>user@test.com</username>
