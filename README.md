@@ -1,6 +1,6 @@
 # Vault Java SDK Maven Plugin
 
-This Maven plugin provides an easy to use set of commands to package, validate, import, and deploy Vault Java SDK source code through the use of defined Maven goals.
+This Maven plugin provides an easy-to-use set of commands to package, validate, import, and deploy Vault Java SDK source code through the use of defined Maven goals.
 
 ## Setup
 
