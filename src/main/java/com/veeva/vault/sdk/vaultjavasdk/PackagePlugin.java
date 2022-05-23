@@ -1,17 +1,12 @@
 package com.veeva.vault.sdk.vaultjavasdk;
 
+import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
+import org.apache.maven.plugins.annotations.Mojo;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
-import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
 
 /**
  * Goal that generates a VPK file in the "deployment/packages" directory.
@@ -24,64 +19,42 @@ import com.veeva.vault.sdk.vaultjavasdk.utilities.PackageManager;
  */
 
 @Mojo( name = "package", requiresProject = false)
-public class PackagePlugin extends AbstractMojo {
-
-	@Parameter( property = "apiVersion", defaultValue = "v18.3" )
-	protected  String apiVersion = "";
-	@Parameter( property = "vaulturl", defaultValue = "" )
-	protected String vaultUrl = "";
-	@Parameter( property = "username", defaultValue = "Vault Java SDK Maven Plugin" )
-	protected String username = "";
-	@Parameter( property = "password", defaultValue = "" )
-	protected String password = "";
-	@Parameter( property = "sessionId", defaultValue = "" )
-	protected String sessionId = "";
-	@Parameter( property = "package", defaultValue = "" )
-	protected String packageName = "";
-	@Parameter( property = "packageId", defaultValue = "" )
-	protected String packageId = "";
-	@Parameter( property = "source" )
-	protected Source source = new Source();
+public class PackagePlugin extends BaseMojo {
 	
 	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
+	public void execute() {
 		
 	    ArrayList<String> filePathArray = new ArrayList<String>();
-		
+		String parentPath = null;
+
 		if (Files.exists(Paths.get("", "javasdk/src/main/java/"))) {
-			
+			parentPath = "javasdk/src/main/java/";
+		} else if (Files.exists(Paths.get("", "src/main/java/"))) {
+			parentPath = "src/main/java/";
+		}
+			if (parentPath != null) {
 			if (source.getSource() != null) {
 				
 			    for (String x : source.getSource()) {
 			    	if (x != null) {
-					    String filePath = PackageManager.getSourcePath(x);
+					    String filePath = PackageManager.getSourcePath(x, parentPath);
 					    filePathArray.add(filePath);
 			    	}
 			    }
 			}
- 
+
 		    try {
 		    	System.out.println("");
-		    	PackageManager.createXMLFile(getUsername());  
-				PackageManager.createZipFileArray(filePathArray);
+		    	PackageManager.createXMLFile(username, deploymentOption);
+				PackageManager.createZipFileArray(filePathArray, deploymentOption);
 			} catch (IOException e) {
 				System.out.println("Packaging error:" + e.toString());
 			}
 		}
 		else {
-			System.out.println("Invalid Vault Java SDK source directory. The code must be in a top level 'javasdk/src/main/java' structure.");
+			System.out.println("Invalid Vault Java SDK source directory. The code must be in a top level of 'javasdk/src/main/java' " +
+					"or 'src/main/java' structure.");
 		}
 	}
-	
-    private String getUsername() {
-    	
-    	if (username.equals("")) {
-    		return "Vault Java SDK Maven Plugin";
-    	}
-    	else {
-        	return username;
-    	}
-    	
-    }
 
 }
