@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -50,7 +51,7 @@ public class PackagePlugin extends AbstractMojo {
 	protected String summary = "";
 	@Parameter( property = "description", defaultValue = "" )
 	protected String description = "";
-	@Parameter( property = "deploymentOption", defaultValue = "incremental" )
+	@Parameter( property = "deploymentOption", defaultValue = "incremental" )  // acceptable values: incremntal or replace_all
 	protected String deploymentOption = "";
 
 	
@@ -65,14 +66,14 @@ public class PackagePlugin extends AbstractMojo {
 				
 			    for (String x : source.getSource()) {
 			    	if (x != null) {
-					    String filePath = PackageManager.getSourcePath(x);
-					    filePathArray.add(filePath);
+					    List<String> filePath = PackageManager.getSourcePath(x);
+					    filePathArray.addAll(filePath);
 			    	}
 			    }
 			}
  
 		    try {
-		    	System.out.println("");
+		    	System.out.println("packaging " + filePathArray.size() + " files");
 		    	PackageManager.createXMLFile(getUsername(), packageName, summary, description, deploymentOption);  
 				PackageManager.createZipFileArray(filePathArray);
 			} catch (IOException e) {

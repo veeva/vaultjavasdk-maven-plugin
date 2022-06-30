@@ -12,6 +12,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.nio.file.PathMatcher;
+import java.nio.file.FileSystems;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.FileVisitResult;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -35,39 +40,99 @@ public class PackageManager {
 		return PROJECT_DIRECTORY.toAbsolutePath().toString();
 	}
 	
-	public static String getSourcePath(String source) {
-		Path path;
-		final String sourcePath;
-		
-		if (source != null) {
-			sourcePath = source.replaceAll("\\.", "/");
-			path = Paths.get("", "javasdk/src/main/java/" + sourcePath);
+
+	
+	/**
+	 * An asterisk, *, matches any number of characters (including none).
+	 * Two asterisks, **, works like * but crosses directory boundaries. This syntax is generally used for matching complete paths.
+	 * slash direction doesn't matter
+	 */
+	// TODO: performance optimization:  allow getSourcePath to accept a List of sourcePatterns, so they can all be tested on one search through folders 
+	public static List<String> getSourcePath(String sourcePattern) {
+
+		if (sourcePattern.equals("*")) {
+			sourcePattern = "**/*.java";		
 		}
 		else {
-			sourcePath = "";
-			path = Paths.get("", "javasdk/src/main/java/");
-		}
-		
-		if (!Files.isDirectory(path)) {
-			Path javaPath = Paths.get("", path + ".java");
-			if (Files.exists(javaPath)) {
-				// specified a java file was specified			
-				path = javaPath;
-			} else {
-				// use original search logic 
-				// this logic is suspect, because it  will match  folderA/folderB/source  to  folderA/folderB/anothersource.java (if it exists) instead of folderA/folderB/source.java (even when source.java exsits)
-				File dir = new File(path.getParent().toAbsolutePath().toString());
-				for(String fileName : dir.list()) {
-					if (fileName.toLowerCase().contains(path.getFileName().toString().toLowerCase())) {
-						path = Paths.get(path.getParent().toString() + "/" + fileName);
-					}
+
+			int posSlash = sourcePattern.lastIndexOf("/");
+			int posDot = sourcePattern.lastIndexOf(".");
+			int posStar = sourcePattern.lastIndexOf("*");
+
+			if (posSlash == -1 && posStar == -1 && !sourcePattern.endsWith(".java"))
+			{
+				// example: com.example.ClassName  			
+				// example: test
+				sourcePattern = sourcePattern.replace(".", "/") + ".java";
+			} else if (posStar >= 0) {
+				if (posSlash >=0 && posStar > posSlash) {
+					// example: test/whatever/*
+					// example: **/*.java   
+					// **/*
+
+					// Do nothing
+				} else {
+					// example: test/*/whatever
+					// example: test/*/whatever/
+					// example: **/test
+
+					sourcePattern = sourcePattern + ".java";					 
 				}
+			} else if (posDot >= 0 && posDot > posSlash) {				
+				if (posSlash == -1) {
+					// example: test.java
+					// example: test.groovy -- not acceptable for vault, but this would match
+					
+					sourcePattern = "**/" + sourcePattern;
+				} else {
+					// example: dir/whatever/test.java				
+					// example: dir.whatever/test.java				
+					// example: dir.whatever/test.groovy -- not acceptable for vault, but this would match
+
+					// Do nothing, cause the user likely knows what they are doing
+				}
+			} else if (posDot == -1 && posStar == -1 && posSlash >= 0) {
+				// example: dor/
+				// example: dir/whatever
+				// example: dir.whatever/test
+				// not an example: test  (because this is matched in rules above)
+				// not an example: test*  (because this is matched in rules abboe)
+
+				sourcePattern = sourcePattern + "*";
+			} else {
+				throw new RuntimeException("not sure how to handle sourcePattern: " + sourcePattern);
 			}
 		}
-	
-		System.out.println("Source Path: " + path.toAbsolutePath().toString());
-		return path.toAbsolutePath().toString();
+		// escape source pattern
+		sourcePattern.replace("\\", "\\\\");
+		sourcePattern.replace("?", "\\?");
+		sourcePattern.replace("{", "\\{");
+		sourcePattern.replace("}", "\\}");
+		sourcePattern.replace("[", "\\[");
+		sourcePattern.replace("]", "\\]");
+
+		Path srcRoot = Paths.get(PROJECT_DIRECTORY.toAbsolutePath().toString(), "javasdk/src/main/java/");
 		
+		PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + sourcePattern);
+		List<String> files = new ArrayList<String>();
+		SimpleFileVisitor<Path> finder = new SimpleFileVisitor<Path>() {
+			public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+				if (path != null && matcher.matches(srcRoot.relativize(path))) {
+					String pathName = path.toAbsolutePath().toString();
+					System.out.println("   Found: " + pathName);
+					files.add(pathName);
+				}
+				
+				return FileVisitResult.CONTINUE;
+			}
+		};
+
+		try {		
+			System.out.println("Searching for " + sourcePattern);
+			Files.walkFileTree(srcRoot, finder);
+		} catch (Exception e) { }
+
+		return files;
 	}
 	
 	public static String getPackagePath() {

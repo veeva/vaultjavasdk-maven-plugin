@@ -34,7 +34,13 @@ Configuration Parameters:
 <packageId> - optional, deploy a specific imported package ID. To be used in conjunction with the vaultjavasdk:import goal. The ID can also be retrieved from the vault UI.
 <source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters.
 	<packages> - comma separated list of package names from the project
-	<classes> - comma separated list of fully qualified java file names
+	<classes> - comma separated list of path matching patterns:
+                a pattern can be a fully qualified java class-- such as com.example.FooClass
+                a pattern can be a java class, which will match in any folder-- such as FooClass
+                a pattern can be a java file, in a specific folder, such as com/example/FooClass.java
+                a pattern can be a java file, which will match in any folder-- such as FooClass.java
+                a pattern can have wildcards ** for matching directories and * for matching, such as **/FooClass.java and com/example/*.java
+                pattern "*" is a special case that matches "**/*.java"                
 <packageName> - optional, the name of the package that will be set in the vaultpackage.xml
 <summary> - optional, the summary that will be set in the vaultpackage.xml
 <description> - optional, the description that will be set in the vaultpackage.xml
