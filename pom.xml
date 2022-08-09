@@ -4,7 +4,7 @@
 
   <groupId>com.veeva.vault.sdk</groupId>
   <artifactId>vaultjavasdk-maven-plugin</artifactId>
-  <version>2.0.0</version>
+  <version>22.2.0</version>
   <packaging>maven-plugin</packaging>
 
   <name>Vault Java SDK Maven Plugin</name>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>com.veeva.vault</groupId>
       <artifactId>vapil</artifactId>
-      <version>22.1.1</version>
+      <version>22.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -72,6 +72,26 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>src/test/resources</exclude>
+                </excludes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
