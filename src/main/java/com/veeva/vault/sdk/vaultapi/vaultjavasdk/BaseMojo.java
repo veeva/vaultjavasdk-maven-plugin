@@ -3,6 +3,7 @@ package com.veeva.vault.sdk.vaultapi.vaultjavasdk;
 import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.client.VaultClientBuilder;
 import com.veeva.vault.vapil.api.client.VaultClientId;
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,10 +31,13 @@ public class BaseMojo extends AbstractMojo {
     @Parameter( property = "source" )
     protected Source source = new Source();
 
+    private static final Logger logger = Logger.getLogger(BaseMojo.class);
+
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (vaultClientId == null) {
-            System.out.println("Initializing Vault Client ID");
+            logger.info("Initializing Vault Client ID");
             vaultClientId = new VaultClientId(
                     "veeva",
                     "vault",
@@ -42,7 +46,7 @@ public class BaseMojo extends AbstractMojo {
                     "mavenPlugin");
 
             if (vaultClient == null) {
-                System.out.println("Initializing Vault Client");
+                logger.info("Initializing Vault Client");
                 VaultClientBuilder vaultClientBuilder = null;
                 if (password != null && !password.isEmpty()) {
                     vaultClientBuilder = VaultClientBuilder

@@ -3,6 +3,7 @@ package com.veeva.vault.sdk.vaultapi.vaultjavasdk;
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities.ErrorHandler;
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities.PackageManager;
 import com.veeva.vault.vapil.api.model.response.ValidatePackageResponse;
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -14,7 +15,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo( name = "validate", requiresProject = false)
 public class ValidatePlugin extends BaseMojo {
-	
+
+	private static final Logger logger = Logger.getLogger(ValidatePlugin.class);
+
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		super.execute();
@@ -22,7 +26,7 @@ public class ValidatePlugin extends BaseMojo {
 		try {
 			if (vaultClient.validateSession()) {
 				//Validates the defined VPK against the specified vault.
-				System.out.println("Session is valid");
+				logger.debug("Session is valid");
 				if (!packageName.equals("")) {
 					PackageManager.setPackagePath(packageName);
 				}
@@ -31,17 +35,17 @@ public class ValidatePlugin extends BaseMojo {
 					ValidatePackageResponse response = PackageManager.validatePackage(vaultClient, PackageManager.getPackagePath());
 
 					if (response.isSuccessful()) {
-						System.out.println("Validation successful");
+						logger.debug("Validation successful");
 					} else {
 						ErrorHandler.logErrors(response);
 					}
 
 				}
 				else {
-			        System.out.println("Cannot validate package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
+			        logger.error("Cannot validate package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
 				}			
 			} else {
-				System.out.println("Not a valid session. Check the login details in the pom file.");
+				logger.error("Not a valid session. Check the login details in the pom file.");
 			}
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block

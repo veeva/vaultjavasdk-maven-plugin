@@ -1,5 +1,6 @@
 package com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities;
 
+import com.veeva.vault.sdk.vaultapi.vaultjavasdk.DeployPlugin;
 import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.response.*;
 import com.veeva.vault.vapil.api.request.ConfigurationMigrationRequest;
@@ -7,6 +8,7 @@ import com.veeva.vault.vapil.api.request.JobRequest;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream.UnicodeExtraFieldPolicy;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -35,6 +37,8 @@ public class PackageManager {
 	private static final String OUTPUT_XML_FILE = "deployment/vaultpackage.xml";
 	private static long writtenBytesCount = 0;
 
+	private static final Logger logger = Logger.getLogger(PackageManager.class);
+
 
 	public static String getProjectPath() {
 		return PROJECT_DIRECTORY.toAbsolutePath().toString();
@@ -62,7 +66,7 @@ public class PackageManager {
 			}
 		}
 
-		System.out.println("Source Path: " + path.toAbsolutePath());
+		logger.debug("Source Path: " + path.toAbsolutePath());
 		return path.toAbsolutePath().toString();
 
 	}
@@ -85,7 +89,7 @@ public class PackageManager {
 			PackageManager.getOutputPackageObject().setLocalDate("");
 		}
 		else {
-			System.out.println("Error:  The defined package must be a '.vpk'.");
+			logger.error("The defined package must be a '.vpk'.");
 			PackageManager.getOutputPackageObject().setFileName("");
 			PackageManager.getOutputPackageObject().setIncrement(0);
 			PackageManager.getOutputPackageObject().setLocalDate("");
@@ -103,13 +107,13 @@ public class PackageManager {
 					try {
 						Files.deleteIfExists(p);
 					} catch (IOException e) {
-						System.out.println("ERROR " + e.toString()+"\n\n");
+						logger.error(e.toString()+"\n\n");
 					}
 			});
 			fileWalk.close();
 
 		} catch (IOException e) {
-			System.out.println("ERROR " + e.toString()+"\n\n");
+			logger.error(e.toString()+"\n\n");
 			return false;
 		}
 		return true;
@@ -180,7 +184,7 @@ public class PackageManager {
 							!Files.isDirectory(pp)).collect(Collectors.toList());
 
 					if (fileList.size() == 0) {
-						System.out.println("There are no source files in \"" + path.toAbsolutePath().toString() + "\". "
+						logger.error("There are no source files in \"" + path.toAbsolutePath().toString() + "\". "
 								+ "\nSource file(s) must be within a 'com/veeva/vault/custom' directory structure.");
 					} else {
 						fileList.forEach(p -> {
@@ -214,9 +218,9 @@ public class PackageManager {
 								writtenBytesCount += Files.copy(p, zs);
 								zs.closeArchiveEntry();
 
-								System.out.println("Adding file to package: " + p.toString());
+								logger.info("Adding file to package: " + p.toString());
 							} catch (IOException e) {
-								System.out.println(e);
+								logger.error(e);
 							}
 						});
 					}
@@ -230,27 +234,27 @@ public class PackageManager {
 				try {
 					zs.putArchiveEntry(zipXMLEntry);
 					Files.copy(Paths.get("", OUTPUT_XML_FILE), zs);
-					System.out.println("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
+					logger.info("Adding file to package: " + Paths.get("", OUTPUT_XML_FILE).toAbsolutePath().toString());
 					zs.closeArchiveEntry();
 				} catch (IOException e) {
-					System.err.println(e);
+					logger.error(e);
 				}
 				zs.flush();
 		        zs.close();
-		        System.out.println("\nPackage file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n");
+		        logger.info("\nPackage file [" + Paths.get("", OUTPUT_ZIP_FILE.getString()).toAbsolutePath().toString()+ "] created.\n");
 	        }
 	        else {
 		        Files.deleteIfExists(outputPath);
-				System.out.println("No files were packaged. VPK was not created.\n\n");
+				logger.info("No files were packaged. VPK was not created.\n\n");
 		        zs.close();
 	        }
 	        writtenBytesCount = 0;
     	}
 	    catch (Exception e) {
-	    	System.out.println("ERROR " + e.toString());
+	    	logger.error(e.toString());
 
 	        Files.deleteIfExists(outputPath);
-			System.out.println("No files were packaged. VPK was not created.\n\n");
+			logger.info("No files were packaged. VPK was not created.\n\n");
 	    }
 	}
 
@@ -269,7 +273,7 @@ public class PackageManager {
 		ValidatePackageResponse validationPackageResponse = validatePackage(vaultClient, packagePath);
 
 		if (validationPackageResponse != null && validationPackageResponse.isSuccessful()) {
-			System.out.println("Validation Successful\nImporting package");
+			logger.info("Validation Successful\nImporting package");
 			response = vaultClient.newRequest(ConfigurationMigrationRequest.class)
 					.setInputPath(PackageManager.getPackagePath())
 					.importPackage();
@@ -280,7 +284,7 @@ public class PackageManager {
 				if (jobStatusResponse != null && jobStatusResponse.isSuccessful()) {
 					PackageImportResultsResponse vaultPackageResponse = getVaultPackageResponse(vaultClient, jobStatusResponse);
 
-					System.out.println("Import Status: " + vaultPackageResponse.getVaultPackage().getStatus());
+					logger.info("Import Status: " + vaultPackageResponse.getVaultPackage().getStatus());
 				} else {
 					ErrorHandler.logErrors(jobStatusResponse);
 				}
@@ -316,7 +320,7 @@ public class PackageManager {
 							VaultResponse packageDeploymentResponse = getVaultPackageResponse(vaultClient, deploymentStatusResponse);
 
 							if (packageDeploymentResponse != null && packageDeploymentResponse.isSuccessful()) {
-								System.out.println("Package Status: " + ((JSONObject) packageDeploymentResponse.getResponseJSON().get("responseDetails")).get("package_status__v"));
+								logger.info("Package Status: " + ((JSONObject) packageDeploymentResponse.getResponseJSON().get("responseDetails")).get("package_status__v"));
 							} else {
 								ErrorHandler.logErrors(packageDeploymentResponse);
 							}
@@ -344,12 +348,12 @@ public class PackageManager {
 		int ctr = 0;
 		do {
 			if (ctr < 1) {
-				System.out.println("Waiting 10 seconds to retry checking the status of the job");
+				logger.info("Waiting 10 seconds to retry checking the status of the job");
 				TimeUnit.SECONDS.sleep(10);
 			}
 			jobStatusResponse = vc.newRequest(JobRequest.class).retrieveJobStatus(jobId);
 			status = jobStatusResponse.getData().getStatus();
-			System.out.println("Package Job Status: " + status);
+			logger.info("Package Job Status: " + status);
 			ctr++;
 		}
 		while (!status.equals("SUCCESS") && !status.equals("ERRORS_ENCOUNTERED") && !status.equals("CANCELLED"));
@@ -392,10 +396,10 @@ public class PackageManager {
 			if (tmp.mkdirs()) {
 				
 	        	  if (System.getProperty("os.name").toLowerCase().contains("windows")){
-	        		  System.out.println("Created the '" + getProjectPath() + "\\deployment\\packages' directory.");
+	        		  logger.info("Created the '" + getProjectPath() + "\\deployment\\packages' directory.");
 				  }
 				  else{
-					  System.out.println("Created the '" + getProjectPath() + "/deployment/packages' directory.");
+					  logger.info("Created the '" + getProjectPath() + "/deployment/packages' directory.");
 				  }
 			}
 			
@@ -413,12 +417,12 @@ public class PackageManager {
 								setIncrement(0);
 							}
 						} catch (IOException e) {
-							System.out.println("ERROR " + e.toString()+"\n\n");
+							logger.error(e.toString()+"\n\n");
 						}
 				});
 				fileWalk.close();
 			} catch (IOException e) {
-				System.out.println("ERROR " + e.toString()+"\n\n");
+				logger.error(e.toString()+"\n\n");
 			}
 		}
 

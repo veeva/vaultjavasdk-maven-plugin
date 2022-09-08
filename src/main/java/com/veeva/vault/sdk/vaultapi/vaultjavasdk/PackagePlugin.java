@@ -1,6 +1,7 @@
 package com.veeva.vault.sdk.vaultapi.vaultjavasdk;
 
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities.PackageManager;
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -22,7 +23,10 @@ import java.util.ArrayList;
 
 @Mojo( name = "package", requiresProject = false)
 public class PackagePlugin extends BaseMojo {
-	
+
+	private static final Logger logger = Logger.getLogger(PackagePlugin.class);
+
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		super.execute();
@@ -47,15 +51,14 @@ public class PackagePlugin extends BaseMojo {
 			}
 
 		    try {
-		    	System.out.println("");
 		    	PackageManager.createXMLFile(username, deploymentOption);
 				PackageManager.createZipFileArray(filePathArray, deploymentOption);
 			} catch (IOException e) {
-				System.out.println("Packaging error:" + e.toString());
+				logger.error("Packaging error:" + e.toString());
 			}
 		}
 		else {
-			System.out.println("Invalid Vault Java SDK source directory. The code must be in a top level of 'javasdk/src/main/java' " +
+			logger.error("Invalid Vault Java SDK source directory. The code must be in a top level of 'javasdk/src/main/java' " +
 					"or 'src/main/java' structure.");
 		}
 	}

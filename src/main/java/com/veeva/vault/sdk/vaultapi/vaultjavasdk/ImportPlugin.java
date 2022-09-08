@@ -1,6 +1,7 @@
 package com.veeva.vault.sdk.vaultapi.vaultjavasdk;
 
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities.PackageManager;
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -12,6 +13,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo( name = "import", requiresProject = false)
 public class ImportPlugin extends BaseMojo {
+
+	private static final Logger logger = Logger.getLogger(ImportPlugin.class);
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		super.execute();
@@ -30,10 +34,10 @@ public class ImportPlugin extends BaseMojo {
 					PackageManager.importPackage(vaultClient, PackageManager.getPackagePath());
 				}
 				else {
-			        System.out.println("Cannot import package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
+			        logger.error("Cannot import package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
 				}			
 			} else {
-				System.out.println("Not a valid session. Check the login details in the pom file.");
+				logger.error("Not a valid session. Check the login details in the pom file.");
 			}
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
