@@ -26,8 +26,6 @@ public class BaseMojo extends AbstractMojo {
     protected String deploymentOption = "";
     @Parameter( property = "package", defaultValue = "" )
     protected String packageName = "";
-    @Parameter( property = "packageId", defaultValue = "" )
-    protected String packageId = "";
     @Parameter( property = "source" )
     protected Source source = new Source();
 

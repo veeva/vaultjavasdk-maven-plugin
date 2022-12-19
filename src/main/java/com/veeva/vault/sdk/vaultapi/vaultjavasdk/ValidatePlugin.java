@@ -18,7 +18,6 @@ public class ValidatePlugin extends BaseMojo {
 
 	private static final Logger logger = Logger.getLogger(ValidatePlugin.class);
 
-
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		super.execute();

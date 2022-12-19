@@ -26,14 +26,12 @@ public class DeployPlugin extends BaseMojo {
 					PackageManager.setPackagePath(packageName);
 				}
 
-				if (packageId.equals("")) {
-					if (PackageManager.getPackagePath() != null) {
+				if (PackageManager.getPackagePath() != null) {
 
-						PackageManager.deployPackage(vaultClient, PackageManager.getPackagePath());
-					}
-					else {
-				        logger.error("Cannot deploy package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
-					}
+					PackageManager.deployPackage(vaultClient, PackageManager.getPackagePath());
+				}
+				else {
+					logger.error("Cannot deploy package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
 				}
 			}
 		} catch (SecurityException e) {

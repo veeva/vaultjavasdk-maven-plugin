@@ -273,7 +273,8 @@ public class PackageManager {
 		ValidatePackageResponse validationPackageResponse = validatePackage(vaultClient, packagePath);
 
 		if (validationPackageResponse != null && validationPackageResponse.isSuccessful()) {
-			logger.info("Validation Successful\nImporting package");
+			logger.info("Validation Successful");
+			logger.info("Importing package");
 			response = vaultClient.newRequest(ConfigurationMigrationRequest.class)
 					.setInputPath(PackageManager.getPackagePath())
 					.importPackage();
@@ -348,8 +349,8 @@ public class PackageManager {
 		int ctr = 0;
 		do {
 			if (ctr < 1) {
-				logger.info("Waiting 10 seconds to retry checking the status of the job");
-				TimeUnit.SECONDS.sleep(10);
+				logger.info("Waiting 15 seconds to retry checking the status of the job");
+				TimeUnit.SECONDS.sleep(15);
 			}
 			jobStatusResponse = vc.newRequest(JobRequest.class).retrieveJobStatus(jobId);
 			status = jobStatusResponse.getData().getStatus();
