@@ -7,24 +7,28 @@ This Maven plugin provides a set of easy-to-use commands that allow you to packa
 
 ## Configuration
 
-To make the Maven plugin available in a Vault Java SDK project, add the following to the project's pom.xml file. The configuration properties can be set in either the pom.xml or as parameters when running the goals.
-
-Configuration Parameters:    
+To make the Maven plugin available in a Vault Java SDK project, you must have a [Vapil settings file](https://github.com/veeva/vault-api-library) and create a separate JSON file with the following attributes:
 
 ```
-<vaultDNS> - a vault’s DNS host name with no HTTPS://. For example, vaulturl.veevavault.com
-<username> - the vault user name to use for authentication required for using the import, deploy, and validate goals
-<password> - the password for user specified in <username>. As a best practice, input the password through the command line or via an IDE build parameter. Avoid saving the password in the pom.xml file 
-<sessionId> - optional, an authenticated live user session id used instead of providing userName/password credentials
-<package> - optional, define a custom VPK to deploy. The VPK must exist in '{{PROJECT_DIRECTORY_PATH}}/deployment/packages'
-<source> - optional, specify packages or class source files to include in the VPK file; if omitted, all files in the project. This is list of parameters.
-	<packages> - comma separated list of package names from the project
-	<classes> - comma separated list of fully qualified java file names
-	
-* Avoid saving the password in the pom.xml file when possible. 
+{
+  "deployment_option": "replace_all", 
+  "package_name": "VPK filename",
+  "package_type": "migration__v",
+  "package_summary": "Summary of the package",
+  "package_description": "Description of the package",
+  "author": "Author of the package",
+  "vault_id": "target Vault ID",
+  "replace_existing": true
+}
+```
+Define the filepath of both the Vapil settings file and the plugin settings file as follows:  
+
+```
+<pluginSettingsFilePath>{absolute_file_path_of_plugin_settings_file}</pluginSettingsFilePath>
+<vapilSettingsFilePath>{absolute_file_path_of_vapil_settings_file}</vapilSettingsFilePath>
 ```
 
-The pom.xml configuration:
+Configure the pom.xml file as follows:
 
 
 ```
@@ -44,16 +48,10 @@ The pom.xml configuration:
         	<plugin>
         		<groupId>com.veeva.vault.sdk</groupId>
 	        	<artifactId>vaultjavasdk-maven-plugin</artifactId>
-	        	<version>22.3.0</version>
+	        	<version>23.1.0</version>
 	        	<configuration>
-	        		<vaultDNS>vaulturl.veevavault.com</vaultDNS>
-	        		<username>user@test.com</username>
-	        		<password></password>
-	        		<sessionId></sessionId>
-	        		<source>
-	        			<packages></packages>
-	        			<classes></classes>
-	        		</source>
+	        		<pluginSettingsFilePath></pluginSettingsFilePath>
+                    <vapilSettingsFilePath></vapilSettingsFilePath>
 	        	</configuration>
         	</plugin>
         </plugins>
@@ -62,47 +60,54 @@ The pom.xml configuration:
 
 ## Maven Goals 
 
-The following goals:
+The plugin has the following Maven goals:
 
-* **vaultjavasdk:clean** - removes all files in the *deployment* folder in the maven project. This folder contains VPK files and vaultpackage.xml file created by this plugin. 
+* **vaultjavasdk:clean** - Removes all files from the "deployment" folder of the Maven project. This folder contains VPK files and the vaultpackage.xml file created by this plugin. 
 
-* **vaultjavasdk:package** - generates a VPK file in the "deployment/packages" directory. 
-    * VPK file name format: code_package_{mm-dd-yyyy}_{num}.vpk
-    * If the directory does not exist, it will be created.
-    * If a VPK already exists, increment {mm-dd-yyyy} and/or {num} 
-    * Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
+* **vaultjavasdk:package** - Generates a VPK file in the "deployment/packages" directory:
+    * Names the VPK file after the `package_name` parameter in the plugin settings file.
+    * Creates the directory if one does not exist.
+    * If the `replace_existing` parameter is set to `true`, invokes the **clean** goal logic and creates a new package. If this parameter is set to `false` and a package of the same name exists in the "deployment/packages" directory, displays an error message requesting that you run the **clean** goal. 
+    * Zips all source files under the “javasdk/src/main/java/com/veeva/vault/custom” or "src/main/java/com/veeva/vault/custom" folder in the project are zipped into a VPK file.
 
-* **vaultjavasdk:deploy** - validates, imports, and deploys the last modified VPK in the "deployment/packages" directory it to a vault. This uses the [Validation Endpoint](https://developer.veevavault.com/api/18.3/#Validate_Code), [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#Import_Package_Config), and [Deploy Package Endpoint](https://developer.veevavault.com/api/18.3/#Deploy_Package_Config).
+* **vaultjavasdk:deploy** - Validates, imports, and deploys the created package to the Vault specified in the Vapil settings file. This uses the [Validate Package](https://developer.veevavault.com/api/23.1/#validate-package) endpoint, [Import Package](https://developer.veevavault.com/api/23.1/#import-package) endpoint, and [Deploy Package](https://developer.veevavault.com/api/23.1/#deploy-package) endpoint.
 
-* **vaultjavasdk:validate** - validates the last modified VPK in the "deployment/packages" directory against the [Validation Endpoint](https://developer.veevavault.com/api/18.3/#Validate_Code).
+* **vaultjavasdk:validate** - Validates he package that was created in the "deployment/packages" directory against the [Validate Package](https://developer.veevavault.com/api/23.1/#validate-package) endpoint.
 
-* **vaultjavasdk:import** - validates and imports the last modified VPK in the "deployment/packages" directory to a vault. **This is optional and is intended for verifying package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validation Endpoint](https://developer.veevavault.com/api/18.3/#Validate_Code) and [Import Package Endpoint](https://developer.veevavault.com/api/18.3/#Import_Package_Config).
+* **vaultjavasdk:import** - Validates and imports the created package to the Vault specified in the Vapil settings file. **This is optional and is intended for verifying the package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validate Package](https://developer.veevavault.com/api/23.1/#validate-package) endpoint and [Import Package](https://developer.veevavault.com/api/23.1/#import-package) endpoint.
 
 
 ### Notes
 
-1. The **validate**, **import**, and **deploy** goals will pick up the last modified ".vpk" file in the "deployment/packages" folder. This means that you can craft your own custom VPK files provided they are the last modified ".vpk" file in the "deployment/packages" folder.
-2. The **package** goal won't replace the "vaultpackage.xml" file in the "deployment" folder. You can modify values in this file to meet your needs.
-3. The **package** goal is run separately from the import, deploy, and validate goals. This means that any code changes will require a "vaultjavasdk:package" before running an import, deploy, or validate if you want to pick up the latest code.
+1. The **package** goal will clean the "deployment" folder if the `replace_existing` parameter is set to `true`. If the parameter is set to `false` and a package exists in the "deployment/package/" directory, the goal will throw an error.
+2. All the parameters needed to authenticate into the target Vault are defined in the Vapil settings file.
+3. All parameters needed to populate the [manifest file](https://developer.veevavault.com/sdk/#create-manifest-file) are defined in the plugin settings file.
+4. We recommend using the **replace_all** or **delete_all** deployment options when using this plugin. We discourage the use of the **incremental** deployment option.
+
 
 
 ## Running Goals
 
 You can either configure the goals in your IDE or run them directly through the Maven command line. To run goals from the command line, 
 navigate to your project's base directory, which is where the pom.xml file is located.
+
+The following example will remove any files in the "deployment" folder, package the project into a VPK, and then deploys the VPK into the target Vault.
    
-    > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy -Dusername=test@user.com -Dpassword=test0000 -DvaultDNS=testurl.veevavault.com
+    > mvn vaultjavasdk:clean vaultjavasdk:package vaultjavasdk:deploy
 
-The following example deploys a custom VPK package:
+The following example validates the named VPK in the plugin settings file:
 
-    > mvn vaultjavasdk:deploy -Dpackage=custom_package.vpk -Dusername=test@user.com -Dpassword=test0000 -DvaultDNS=testurl.veevavault.com  
-
+    > mvn vaultjavasdk:validate  
     
+The following example validates and then imports the named VPK in the plugin settings file:
+
+    > mvn vaultjavasdk:import  
+
 ## License
 
 This code serves as an example and is not meant for production use.
 
-Copyright 2022 Veeva Systems Inc.
+Copyright 2023 Veeva Systems Inc.
  
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
