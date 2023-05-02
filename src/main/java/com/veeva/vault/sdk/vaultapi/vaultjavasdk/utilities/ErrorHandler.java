@@ -28,9 +28,6 @@ public class ErrorHandler {
 				} else {
 					List<String> errors = ((List<Map<String, List<String>>>) ((ValidatePackageResponse) response)
 							.getResponseDetails().getPackageSteps().get(0).get("validation_errors")).get(0).get("message");
-					if (packageErrors != null) {
-						logger.error("Errors: " + String.join("\n", errors));
-					}
 				}
 			} else {
 				if (response.getErrors() != null) {

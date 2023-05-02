@@ -1,28 +1,30 @@
 package com.veeva.vault.sdk.vaultapi.vaultjavasdk;
 
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities.PackageManager;
+import com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities.VaultPackage;
 import org.apache.log4j.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import java.io.IOException;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 /**
  * Goal that generates a VPK file in the "deployment/packages" directory.
  * 
- * 		1) VPK file name format: code_package_{mm-dd-yyyy}_{num}.vpk
+ * 		1) VPK file is named after the "package_name" parameter in the plugin settings file
  * 		2) If the directory does not exist, it will be created.
- * 		3) If a VPK already exists, increment {mm-dd-yyyy} and/or {num}
- * 		4) Source files under the “javasdk/src/main/java/com/veeva/vault/custom” folder in the project are zipped into a VPK file.
+ * 		3) If the "replace_existing" parameter is set to true, the clean goal logic is invoked and a new package is created.
+ * 		If this parameter is set to false and a package of the same name exists in the "deployment/packages" directory,
+ * 		then an error message will be displayed requesting that you clean.
+ * 		4) Source files under the “javasdk/src/main/java/com/veeva/vault/custom” or "src/main/java/com/veeva/vault/custom" folder in the project are zipped into a VPK file.
  * 
  */
 
 @Mojo( name = "package", requiresProject = false)
-public class PackagePlugin extends BaseMojo {
+public class PackagePlugin extends BasePlugin {
 
 	private static final Logger logger = Logger.getLogger(PackagePlugin.class);
 
@@ -30,36 +32,30 @@ public class PackagePlugin extends BaseMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		super.execute();
-		
-	    ArrayList<String> filePathArray = new ArrayList<String>();
-		String parentPath = null;
+
+		StringBuilder sourcePath = new StringBuilder(USER_DIR);
 
 		if (Files.exists(Paths.get("", "javasdk/src/main/java/"))) {
-			parentPath = "javasdk/src/main/java/";
+			sourcePath.append("/javasdk/");
 		} else if (Files.exists(Paths.get("", "src/main/java/"))) {
-			parentPath = "src/main/java/";
+			sourcePath.append("/src/");
 		}
-			if (parentPath != null) {
-			if (source.getSource() != null) {
-				
-			    for (String x : source.getSource()) {
-			    	if (x != null) {
-					    String filePath = PackageManager.getSourcePath(x, parentPath);
-					    filePathArray.add(filePath);
-			    	}
-			    }
-			}
 
-		    try {
-		    	PackageManager.createXMLFile(username, deploymentOption);
-				PackageManager.createZipFileArray(filePathArray, deploymentOption);
-			} catch (IOException e) {
-				logger.error("Packaging error:" + e.toString());
+		boolean contentsDeleted = true;
+		if (pluginSettings.getReplaceExisting()) {
+			if (PackageManager.cleanPackageDirectory()) {
+				logger.info("Deployment folder contents deleted.");
+			}
+			else {
+				contentsDeleted = false;
+				logger.error("Deployment folder doesn't exist or contents could not be deleted.");
 			}
 		}
-		else {
-			logger.error("Invalid Vault Java SDK source directory. The code must be in a top level of 'javasdk/src/main/java' " +
-					"or 'src/main/java' structure.");
+
+		if (contentsDeleted) {
+			VaultPackage vaultPackage = new VaultPackage();
+			vaultPackage.createManifest(pluginSettings, new File(OUTPUT_XML_FILE));
+			vaultPackage.packAll(new File(sourcePath.toString()), new File(VPK_OUTPUT_DESTINATION), new File(OUTPUT_XML_FILE));
 		}
 	}
 
