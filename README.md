@@ -51,7 +51,7 @@ Configure the pom.xml file as follows:
 	        	<version>23.1.0</version>
 	        	<configuration>
 	        		<pluginSettingsFilePath></pluginSettingsFilePath>
-                    <vapilSettingsFilePath></vapilSettingsFilePath>
+	        		<vapilSettingsFilePath></vapilSettingsFilePath>
 	        	</configuration>
         	</plugin>
         </plugins>
