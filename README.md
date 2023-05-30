@@ -16,8 +16,8 @@ To make the Maven plugin available in a Vault Java SDK project, you must have a 
   "package_type": "migration__v",
   "package_summary": "Summary of the package",
   "package_description": "Description of the package",
-  "author": "Author of the package",
-  "vault_id": "target Vault ID",
+  "author": "vault.user@vaultdomain.com",
+  "vault_id": "000001",
   "replace_existing": true
 }
 ```
@@ -48,7 +48,7 @@ Configure the pom.xml file as follows:
         	<plugin>
         		<groupId>com.veeva.vault.sdk</groupId>
 	        	<artifactId>vaultjavasdk-maven-plugin</artifactId>
-	        	<version>23.1.0</version>
+	        	<version>23.1.1</version>
 	        	<configuration>
 	        		<pluginSettingsFilePath></pluginSettingsFilePath>
 	        		<vapilSettingsFilePath></vapilSettingsFilePath>
