@@ -27,9 +27,12 @@ public class BasePlugin extends AbstractMojo {
     protected PluginSettings pluginSettings;
     protected String PACKAGE_NAME = null;
     protected Path PACKAGE_PATH = null;
+    protected String IMPORT_LOG_FILE = LOG_OUTPUT_DESTINATION + "import-log";
+    protected String DEPLOYMENT_LOG_FILE = LOG_OUTPUT_DESTINATION + "deployment-log";
     protected static final String USER_DIR = System.getProperty("user.dir");
-    protected static final String OUTPUT_XML_FILE = USER_DIR + "/deployment/";
+    protected static final String DEPLOYMENT_DIRECTORY = USER_DIR + "/deployment/";
     protected static final String VPK_OUTPUT_DESTINATION = USER_DIR + "/deployment/packages/";
+    protected static final String LOG_OUTPUT_DESTINATION = USER_DIR + "/deployment/logs/";
 
     private static final Logger logger = Logger.getLogger(BasePlugin.class);
 
@@ -85,5 +88,4 @@ public class BasePlugin extends AbstractMojo {
         File file = new File(filePath);
         return new String(Files.readAllBytes(Paths.get(file.getPath())));
     }
-
 }

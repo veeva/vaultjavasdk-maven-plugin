@@ -3,14 +3,15 @@
   <groupId>com.veeva.vault.sdk</groupId>
   <artifactId>vaultjavasdk-maven-plugin</artifactId>
   <versioning>
-    <release>23.1.0</release>
+    <release>23.1.1</release>
     <versions>
       <version>2.0.0</version>
       <version>22.2.0</version>
       <version>22.2.1</version>
       <version>22.3.0</version>
       <version>23.1.0</version>
+      <version>23.1.1</version>
     </versions>
-    <lastUpdated>20230502164605</lastUpdated>
+    <lastUpdated>20230530161522</lastUpdated>
   </versioning>
 </metadata>

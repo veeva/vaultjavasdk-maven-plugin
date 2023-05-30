@@ -43,19 +43,20 @@ public class PackagePlugin extends BasePlugin {
 
 		boolean contentsDeleted = true;
 		if (pluginSettings.getReplaceExisting()) {
-			if (PackageManager.cleanPackageDirectory()) {
-				logger.info("Deployment folder contents deleted.");
-			}
-			else {
-				contentsDeleted = false;
-				logger.error("Deployment folder doesn't exist or contents could not be deleted.");
+			if (Files.exists(Paths.get(DEPLOYMENT_DIRECTORY))) {
+				if (PackageManager.cleanPackageDirectory()) {
+					logger.info("Deployment folder contents deleted.");
+				} else {
+					contentsDeleted = false;
+					logger.error("Deployment folder doesn't exist or contents could not be deleted.");
+				}
 			}
 		}
 
 		if (contentsDeleted) {
 			VaultPackage vaultPackage = new VaultPackage();
-			vaultPackage.createManifest(pluginSettings, new File(OUTPUT_XML_FILE));
-			vaultPackage.packAll(new File(sourcePath.toString()), new File(VPK_OUTPUT_DESTINATION), new File(OUTPUT_XML_FILE));
+			vaultPackage.createManifest(pluginSettings, new File(DEPLOYMENT_DIRECTORY));
+			vaultPackage.packAll(new File(sourcePath.toString()), new File(VPK_OUTPUT_DESTINATION), new File(DEPLOYMENT_DIRECTORY));
 		}
 	}
 

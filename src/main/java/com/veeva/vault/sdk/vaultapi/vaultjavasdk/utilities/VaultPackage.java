@@ -8,13 +8,13 @@ import com.veeva.vault.sdk.vaultapi.vaultjavasdk.model.PluginSettings;
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.model.data.CsvDataStep;
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.model.data.CsvManifest;
 import com.veeva.vault.sdk.vaultapi.vaultjavasdk.model.data.StepManifest;
+import com.veeva.vault.sdk.vaultapi.vaultjavasdk.model.request.PackageDeploymentRequest;
 import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.response.*;
 import com.veeva.vault.vapil.api.request.ConfigurationMigrationRequest;
 import com.veeva.vault.vapil.api.request.JobRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -372,13 +372,14 @@ public class VaultPackage {
         return response;
     }
 
-    public static JobCreateResponse importPackage(VaultClient vaultClient, Path packagePath) throws InterruptedException {
+    public static PackageImportResultsResponse importPackage(VaultClient vaultClient, Path packagePath) throws InterruptedException {
 
-        JobCreateResponse response = null;
+        PackageImportResultsResponse vaultPackageResponse = null;
 
         ValidatePackageResponse validationPackageResponse = validatePackage(vaultClient, packagePath);
 
         if (validationPackageResponse != null && validationPackageResponse.isSuccessful()) {
+            JobCreateResponse response;
             logger.info("Validation Successful");
             logger.info("Importing package");
             response = vaultClient.newRequest(ConfigurationMigrationRequest.class)
@@ -389,9 +390,10 @@ public class VaultPackage {
                 JobStatusResponse jobStatusResponse = getPackageJobResponse(vaultClient, response.getJobId());
 
                 if (jobStatusResponse != null && jobStatusResponse.isSuccessful()) {
-                    PackageImportResultsResponse vaultPackageResponse = getVaultPackageResponse(vaultClient, jobStatusResponse);
+                    vaultPackageResponse = getVaultPackageImportResponse(vaultClient, jobStatusResponse);
 
                     logger.info("Import Status: " + vaultPackageResponse.getVaultPackage().getStatus());
+
                 } else {
                     ErrorHandler.logErrors(jobStatusResponse);
                 }
@@ -401,51 +403,52 @@ public class VaultPackage {
         } else {
             ErrorHandler.logErrors(validationPackageResponse);
         }
-        return response;
+        return vaultPackageResponse;
     }
 
-    public static void deployPackage(VaultClient vaultClient, Path packagePath) throws InterruptedException {
+    public static PackageDeploymentResultsResponse deployPackage(VaultClient vaultClient, Path packagePath) throws InterruptedException, IOException {
 
-        JobCreateResponse importResponse = importPackage(vaultClient, packagePath);
+        PackageDeploymentResultsResponse packageDeploymentResponse = null;
 
-        if (importResponse != null && importResponse.isSuccessful()) {
-            JobStatusResponse jobStatusResponse = getPackageJobResponse(vaultClient, importResponse.getJobId());
+        PackageImportResultsResponse packageImportResponse = importPackage(vaultClient, packagePath);
 
-            if (jobStatusResponse != null && jobStatusResponse.isSuccessful()) {
-                PackageImportResultsResponse packageImportResponse = getVaultPackageResponse(vaultClient, jobStatusResponse);
+        if (packageImportResponse != null && packageImportResponse.isSuccessful()) {
+            String packageStatus = packageImportResponse.getVaultPackage().getPackageStatus();
+            if (packageStatus.equals("blocked__v")) {
+                logger.info("The VPK has imported successfully but has a BLOCKED status. The logs have been downloaded");
+                String validationLogUrl = packageImportResponse.getVaultPackage().getLog().get(0).getUrl();
 
-                if (packageImportResponse != null && packageImportResponse.isSuccessful()) {
-                    String packageId = packageImportResponse.getVaultPackage().getId();
+                ErrorHandler.retrieveImportLogs(vaultClient, validationLogUrl);
 
-                    JobCreateResponse deploymentJobResponse = vaultClient.newRequest(ConfigurationMigrationRequest.class)
-                            .deployPackage(packageId);
+            } else {
+                String packageId = packageImportResponse.getVaultPackage().getId();
 
-                    if (deploymentJobResponse != null && deploymentJobResponse.isSuccessful()) {
-                        JobStatusResponse deploymentStatusResponse = getPackageJobResponse(vaultClient, deploymentJobResponse.getJobId());
+                JobCreateResponse deploymentJobResponse = vaultClient.newRequest(ConfigurationMigrationRequest.class)
+                        .deployPackage(packageId);
 
-                        if (deploymentStatusResponse != null) {
-                            VaultResponse packageDeploymentResponse = getVaultPackageResponse(vaultClient, deploymentStatusResponse);
+                if (deploymentJobResponse != null && deploymentJobResponse.isSuccessful()) {
+                    JobStatusResponse deploymentStatusResponse = getPackageJobResponse(vaultClient, deploymentJobResponse.getJobId());
 
-                            if (packageDeploymentResponse != null && packageDeploymentResponse.isSuccessful()) {
-                                logger.info("Package Status: " + ((JSONObject) packageDeploymentResponse.getResponseJSON().get("responseDetails")).get("package_status__v"));
-                            } else {
-                                ErrorHandler.logErrors(packageDeploymentResponse);
-                            }
+                    if (deploymentStatusResponse != null) {
+                        packageDeploymentResponse = getVaultPackageDeploymentResponse(vaultClient, deploymentStatusResponse);
+
+                        if (packageDeploymentResponse != null && packageDeploymentResponse.isSuccessful()) {
+                            logger.info("Package Status: " + packageDeploymentResponse.getResponseDetails().getPackageStatus());
                         } else {
-                            ErrorHandler.logErrors(deploymentJobResponse);
+                            ErrorHandler.logErrors(packageDeploymentResponse);
                         }
                     } else {
                         ErrorHandler.logErrors(deploymentJobResponse);
                     }
                 } else {
-                    ErrorHandler.logErrors(packageImportResponse);
+                    ErrorHandler.logErrors(deploymentJobResponse);
                 }
-            } else {
-                ErrorHandler.logErrors(jobStatusResponse);
             }
         } else {
-            ErrorHandler.logErrors(importResponse);
+            ErrorHandler.logErrors(packageImportResponse);
         }
+
+        return packageDeploymentResponse;
     }
 
     public static JobStatusResponse getPackageJobResponse(VaultClient vc, Integer jobId) throws InterruptedException {
@@ -467,12 +470,22 @@ public class VaultPackage {
         return jobStatusResponse;
     }
 
-    public static PackageImportResultsResponse getVaultPackageResponse(VaultClient vaultClient, JobStatusResponse jobStatusResponse) {
+    public static PackageImportResultsResponse getVaultPackageImportResponse(VaultClient vaultClient, JobStatusResponse jobStatusResponse) {
 
         String href = jobStatusResponse.getData().getLinks().stream().filter(link -> link.getRel().equals("artifacts")).findFirst().get().getHref();
 
         PackageImportResultsResponse response = vaultClient.newRequest(ConfigurationMigrationRequest.class)
                 .retrievePackageImportResultsByHref(href);
+
+        return response;
+    }
+
+    public static PackageDeploymentResultsResponse getVaultPackageDeploymentResponse(VaultClient vaultClient, JobStatusResponse jobStatusResponse) {
+
+        String href = jobStatusResponse.getData().getLinks().stream().filter(link -> link.getRel().equals("artifacts")).findFirst().get().getHref();
+
+        PackageDeploymentResultsResponse response = vaultClient.newRequest(PackageDeploymentRequest.class)
+                .retrievePackageDeploymentResultsByHref(href);
 
         return response;
     }

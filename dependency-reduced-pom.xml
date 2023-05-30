@@ -5,7 +5,7 @@
   <artifactId>vaultjavasdk-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Vault Java SDK Maven Plugin</name>
-  <version>23.1.0</version>
+  <version>23.1.1</version>
   <build>
     <plugins>
       <plugin>

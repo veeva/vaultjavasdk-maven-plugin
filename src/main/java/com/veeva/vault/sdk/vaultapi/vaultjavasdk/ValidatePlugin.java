@@ -33,7 +33,7 @@ public class ValidatePlugin extends BasePlugin {
 					ValidatePackageResponse response = VaultPackage.validatePackage(vaultClient, PACKAGE_PATH);
 
 					if (response.isSuccessful()) {
-						logger.info("VPK is valid");
+						logger.info("Package Status: " + response.getResponseDetails().getPackageStatus());
 					} else {
 						ErrorHandler.logErrors(response);
 					}
@@ -43,7 +43,7 @@ public class ValidatePlugin extends BasePlugin {
 			        logger.error("Cannot validate package. There is no VPK in '<PROJECT_DIRECTORY>/deployment/packages/'.");
 				}			
 			} else {
-				logger.error("Not a valid session. Check the login details in the pom file.");
+				logger.error("Not a valid session. Check the login details in the Vapil settings file.");
 			}
 		} catch (SecurityException | IllegalArgumentException e) {
 			// TODO Auto-generated catch block
