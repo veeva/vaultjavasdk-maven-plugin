@@ -48,7 +48,7 @@ Configure the pom.xml file as follows:
         	<plugin>
         		<groupId>com.veeva.vault.sdk</groupId>
 	        	<artifactId>vaultjavasdk-maven-plugin</artifactId>
-	        	<version>23.1.1</version>
+	        	<version>24.1.0</version>
 	        	<configuration>
 	        		<pluginSettingsFilePath></pluginSettingsFilePath>
 	        		<vapilSettingsFilePath></vapilSettingsFilePath>
@@ -70,11 +70,11 @@ The plugin has the following Maven goals:
     * If the `replace_existing` parameter is set to `true`, invokes the **clean** goal logic and creates a new package. If this parameter is set to `false` and a package of the same name exists in the "deployment/packages" directory, displays an error message requesting that you run the **clean** goal. 
     * Zips all source files under the “javasdk/src/main/java/com/veeva/vault/custom” or "src/main/java/com/veeva/vault/custom" folder in the project are zipped into a VPK file.
 
-* **vaultjavasdk:deploy** - Validates, imports, and deploys the created package to the Vault specified in the Vapil settings file. This uses the [Validate Package](https://developer.veevavault.com/api/23.1/#validate-package) endpoint, [Import Package](https://developer.veevavault.com/api/23.1/#import-package) endpoint, and [Deploy Package](https://developer.veevavault.com/api/23.1/#deploy-package) endpoint.
+* **vaultjavasdk:deploy** - Validates, imports, and deploys the created package to the Vault specified in the Vapil settings file. This uses the [Validate Package](https://developer.veevavault.com/api/24.1/#validate-package) endpoint, [Import Package](https://developer.veevavault.com/api/24.1/#import-package) endpoint, and [Deploy Package](https://developer.veevavault.com/api/24.1/#deploy-package) endpoint.
 
-* **vaultjavasdk:validate** - Validates he package that was created in the "deployment/packages" directory against the [Validate Package](https://developer.veevavault.com/api/23.1/#validate-package) endpoint.
+* **vaultjavasdk:validate** - Validates he package that was created in the "deployment/packages" directory against the [Validate Package](https://developer.veevavault.com/api/24.1/#validate-package) endpoint.
 
-* **vaultjavasdk:import** - Validates and imports the created package to the Vault specified in the Vapil settings file. **This is optional and is intended for verifying the package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validate Package](https://developer.veevavault.com/api/23.1/#validate-package) endpoint and [Import Package](https://developer.veevavault.com/api/23.1/#import-package) endpoint.
+* **vaultjavasdk:import** - Validates and imports the created package to the Vault specified in the Vapil settings file. **This is optional and is intended for verifying the package in Vault Admin UI before deploying via the Vault Admin UI**. This uses the [Validate Package](https://developer.veevavault.com/api/24.1/#validate-package) endpoint and [Import Package](https://developer.veevavault.com/api/24.1/#import-package) endpoint.
 
 
 ### Notes
@@ -107,7 +107,7 @@ The following example validates and then imports the named VPK in the plugin set
 
 This code serves as an example and is not meant for production use.
 
-Copyright 2023 Veeva Systems Inc.
+Copyright 2024 Veeva Systems Inc.
  
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

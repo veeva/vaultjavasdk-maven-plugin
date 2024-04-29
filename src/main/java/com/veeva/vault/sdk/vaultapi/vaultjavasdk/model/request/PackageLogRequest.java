@@ -13,9 +13,9 @@ public class PackageLogRequest extends VaultRequest {
         HttpRequestConnector request = new HttpRequestConnector(url);
 
         if (outputPath != null) {
-            return sendToFile(HttpRequestConnector.HttpMethod.GET, request, outputPath, VaultResponse.class);
+            return (VaultResponse) sendToFile(HttpRequestConnector.HttpMethod.GET, request, outputPath, VaultResponse.class);
         } else {
-            return sendReturnBinary(HttpRequestConnector.HttpMethod.GET, request, VaultResponse.class);
+            return (VaultResponse) sendReturnBinary(HttpRequestConnector.HttpMethod.GET, request, VaultResponse.class);
         }
     }
 

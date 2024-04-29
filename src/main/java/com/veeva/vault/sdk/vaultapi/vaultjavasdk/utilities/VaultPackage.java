@@ -14,7 +14,8 @@ import com.veeva.vault.vapil.api.model.response.*;
 import com.veeva.vault.vapil.api.request.ConfigurationMigrationRequest;
 import com.veeva.vault.vapil.api.request.JobRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ import java.util.stream.Stream;
 
 public class VaultPackage {
 
-    private static final Logger logger = Logger.getLogger(VaultPackage.class);
+    private static final Logger logger = LogManager.getLogger(VaultPackage.class);
 
 
     public void createManifest(PluginSettings pluginSettings, File outputDirectory) {
@@ -378,6 +379,8 @@ public class VaultPackage {
 
         ValidatePackageResponse validationPackageResponse = validatePackage(vaultClient, packagePath);
 
+        String validationResponse = validationPackageResponse.getResponseDetails().getPackageSteps().get(0).getValidationResponse();
+
         if (validationPackageResponse != null && validationPackageResponse.isSuccessful()) {
             JobCreateResponse response;
             logger.info("Validation Successful");
@@ -457,7 +460,7 @@ public class VaultPackage {
         JobStatusResponse jobStatusResponse;
         int ctr = 0;
         do {
-            if (ctr < 1) {
+            if (ctr < 10) {
                 logger.info("Waiting 15 seconds to retry checking the status of the job");
                 TimeUnit.SECONDS.sleep(15);
             }

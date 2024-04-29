@@ -1,7 +1,8 @@
 package com.veeva.vault.sdk.vaultapi.vaultjavasdk.model;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 public class CompressionHelper {
 
-    private static Logger logger = Logger.getLogger(CompressionHelper.class);
+    private static Logger logger = LogManager.getLogger(CompressionHelper.class);
 
     public static File newFile(File outputDirectory, ZipEntry zipEntry) throws IOException {
         //logger.info(zipEntry.getName());

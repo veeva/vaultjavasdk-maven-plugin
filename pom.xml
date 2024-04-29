@@ -4,7 +4,7 @@
 
   <groupId>com.veeva.vault.sdk</groupId>
   <artifactId>vaultjavasdk-maven-plugin</artifactId>
-  <version>23.1.1</version>
+  <version>24.1.0</version>
   <packaging>maven-plugin</packaging>
 
   <name>Vault Java SDK Maven Plugin</name>
@@ -14,7 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jackson.version>2.14.2</jackson.version>
+    <jackson.version>2.15.1</jackson.version>
   </properties>
 
   <repositories>
@@ -37,7 +37,17 @@
     <dependency>
       <groupId>com.veeva.vault</groupId>
       <artifactId>vapil</artifactId>
-      <version>23.1.1</version>
+      <version>24.1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>shaded.org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>shaded.org.apache.logging.log4j</groupId>
+          <artifactId>log4j-slf4j-impl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -68,6 +78,11 @@
 	    <artifactId>commons-compress</artifactId>
 	    <version>1.21</version>
 	</dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.11.0</version>
+    </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
@@ -102,6 +117,21 @@
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
       <version>5.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20210307</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.14.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.14.1</version>
     </dependency>
   </dependencies>
 
@@ -179,9 +209,7 @@
     <profile>
       <id>run-its</id>
       <build>
-
         <plugins>
-
           <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -191,9 +219,7 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-          
         </plugins>
-
       </build>
     </profile>
   </profiles>

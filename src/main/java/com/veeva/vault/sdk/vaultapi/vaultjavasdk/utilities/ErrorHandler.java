@@ -4,7 +4,8 @@ import com.veeva.vault.sdk.vaultapi.vaultjavasdk.model.request.PackageLogRequest
 import com.veeva.vault.vapil.api.client.VaultClient;
 import com.veeva.vault.vapil.api.model.response.ValidatePackageResponse;
 import com.veeva.vault.vapil.api.model.response.VaultResponse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public class ErrorHandler {
 
-	private static final Logger logger = Logger.getLogger(ErrorHandler.class);
+	private static final Logger logger = LogManager.getLogger(ErrorHandler.class);
 	private static final String LOG_OUTPUT_DESTINATION = System.getProperty("user.dir") + "/deployment/logs/";
 
 	public static void logErrors(VaultResponse response) throws SecurityException, IllegalArgumentException {
@@ -30,11 +31,11 @@ public class ErrorHandler {
 
 			if (response instanceof ValidatePackageResponse) {
 				String packageErrors = ((ValidatePackageResponse) response).getResponseDetails().getPackageError();
-				if (packageErrors != null) {
+				if (packageErrors != null && !packageErrors.isEmpty()) {
 					logger.error(packageErrors);
 				} else {
-					List<String> errors = ((List<Map<String, List<String>>>) ((ValidatePackageResponse) response)
-							.getResponseDetails().getPackageSteps().get(0).get("validation_errors")).get(0).get("message");
+					logger.error(((List<Map<String, List<String>>>) ((ValidatePackageResponse) response)
+							.getResponseDetails().getPackageSteps().get(0).get("validation_errors")).get(0).get("message"));
 				}
 			} else {
 				if (response.getErrors() != null) {

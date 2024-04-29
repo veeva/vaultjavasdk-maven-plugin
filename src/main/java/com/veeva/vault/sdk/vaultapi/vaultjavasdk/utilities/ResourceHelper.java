@@ -1,6 +1,7 @@
 package com.veeva.vault.sdk.vaultapi.vaultjavasdk.utilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
 public class ResourceHelper {
-    private static final Logger logger = Logger.getLogger(ResourceHelper.class);
+    private static final Logger logger = LogManager.getLogger(ResourceHelper.class);
     private static Path runPath;
 
     public static void setRunPath(Path runPath) {

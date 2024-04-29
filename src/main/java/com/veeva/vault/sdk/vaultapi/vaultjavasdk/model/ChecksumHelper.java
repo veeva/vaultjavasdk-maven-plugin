@@ -1,6 +1,10 @@
 package com.veeva.vault.sdk.vaultapi.vaultjavasdk.model;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.io.IOUtils;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +13,7 @@ import java.security.MessageDigest;
 
 public class ChecksumHelper {
 
-    private static Logger logger = Logger.getLogger(ChecksumHelper.class);
+    private static Logger logger = LogManager.getLogger(ChecksumHelper.class);
 
     public static String getHash(InputStream inputStream, String hashType) {
         try {
@@ -38,7 +42,7 @@ public class ChecksumHelper {
 
     public static String getMd5(String txt) {
         try {
-            return getHash(org.apache.commons.io.IOUtils.toInputStream(txt, "UTF-8"), "MD5");
+            return getHash(IOUtils.toInputStream(txt, StandardCharsets.UTF_8), "MD5");
         } catch (Exception e) {
             logger.error(e.getMessage());
             return null;

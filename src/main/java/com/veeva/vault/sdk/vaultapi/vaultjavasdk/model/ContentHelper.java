@@ -5,7 +5,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.opencsv.CSVReader;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,7 +18,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class ContentHelper {
-    private static Logger logger = Logger.getLogger(ContentHelper.class);
+    private static Logger logger = LogManager.getLogger(ContentHelper.class);
     public static final Character[] INVALID_FILENAME_SPECIFIC_CHARS = {'"', '*', ':', '<', '>', '?', '\\', '|', 0x7F, '\000'};
 
 
